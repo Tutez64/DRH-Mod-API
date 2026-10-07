@@ -1,0 +1,10 @@
+{
+  "id": "api",
+  "name": "API",
+  "description": "The official API every mod builds on: stable wrappers and events for heroes, floors, the signed-in account and more.",
+  "version": "1.0.0",
+  "author": "Tutez",
+  "drh": "14",
+  "entry": "Main",
+  "uses": ["extends"]
+}
