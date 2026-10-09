@@ -58,7 +58,7 @@ class Context {
 		return Hub.listen(core, Hub.HERO_SPAWNED, handler);
 	}
 
-	/** A hero leaves the floor. Its wrapper reads empty from here on; its player stays. */
+	/** A hero leaves the floor. Its wrapper still reads it in the handlers, empty after them; its player stays. */
 	public function onHeroDespawned(handler:Hero->Void):Subscription {
 		return Hub.listen(core, Hub.HERO_DESPAWNED, handler);
 	}

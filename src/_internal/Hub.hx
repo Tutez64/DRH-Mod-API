@@ -180,10 +180,11 @@ class Hub {
 		var hero = heroes.get(key);
 		if (hero == null)
 			return;
-		hero.detach();
+		hero.leave();
 		heroes.remove(key);
 		state.removeHero(hero);
 		emit(HERO_DESPAWNED, hero);
+		hero.detach();
 	}
 
 	static function floorEnter(object:DistributedDungeonFloor):Void {

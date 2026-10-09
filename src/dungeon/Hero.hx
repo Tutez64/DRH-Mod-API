@@ -5,7 +5,7 @@ import mods.api.account.Weapon;
 
 /**
  * One hero on a dungeon floor: what a player plays there. Each floor gives a new one. Fields read
- * the live object and go empty at `heroDespawned`; the player behind it stays in `player`.
+ * the live object and go empty after the `heroDespawned` handlers; the player behind it stays in `player`.
  */
 class Hero {
 	/** The hero's object id on the floor, not an account: see `player`. */
@@ -38,11 +38,16 @@ class Hero {
 		id = hero.id;
 	}
 
-	/** At `heroDespawned`, before its handlers: the player keeps what was last read, fields read empty from there on. */
+	/** At `heroDespawned`, before its handlers: the player keeps what was last read and is no longer on it. */
 	@:allow(mods.api._internal.Hub)
-	function detach():Void {
+	function leave():Void {
 		if (player != null && player.hero == this)
 			player.setHero(null);
+	}
+
+	/** After the `heroDespawned` handlers: fields read empty from there on. */
+	@:allow(mods.api._internal.Hub)
+	function detach():Void {
 		hero = null;
 	}
 
