@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api.account;
 
 /** One pet, copied when read. */
 class Pet {
@@ -14,7 +14,7 @@ class Pet {
 
 	public var speedRating(default, null):UInt;
 
-	@:allow(mods.api.Inventory, mods.api.OwnedHero)
+	@:allow(mods.api.account.Inventory, mods.api.account.OwnedHero)
 	function new(id:UInt, name:String, attackRating:UInt, defenseRating:UInt, speedRating:UInt) {
 		this.id = id;
 		this.name = name;

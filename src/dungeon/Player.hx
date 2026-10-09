@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api.dungeon;
 
 import brain.jsonRPC.JSONRPCService;
 import distributedObjects.PresenceManager;
@@ -7,6 +7,8 @@ import facade.DBFacade;
 import facade.Locale;
 import flash.display.Sprite;
 import flash.text.TextFormat;
+import mods.api._internal.Art;
+import mods.api._internal.Hub;
 import uI.friendManager.UIFriendManager;
 import uI.popup.DBUITwoButtonPopup;
 import uI.popup.UIReportPopup;
@@ -43,14 +45,14 @@ class Player {
 
 	var knownSkin:UInt = 0;
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function new(accountId:UInt, local:Bool) {
 		this.accountId = accountId;
 		this.local = local;
 	}
 
-	@:allow(mods.api.Hub)
-	@:allow(mods.api.Hero)
+	@:allow(mods.api._internal.Hub)
+	@:allow(mods.api.dungeon.Hero)
 	function setHero(value:Null<Hero>):Void {
 		remember();
 		hero = value;

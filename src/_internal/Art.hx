@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api._internal;
 
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
@@ -16,8 +16,8 @@ import uI.inventory.UIWeaponTooltip;
  * Game art handed to mods as plain sprites. Each sprite loads its art itself and releases it when
  * removed from its parent. Not for mods: they go through `Weapon` and `Hero`.
  */
-@:allow(mods.api.Weapon)
-@:allow(mods.api.Player)
+@:allow(mods.api.account.Weapon)
+@:allow(mods.api.dungeon.Player)
 class Art {
 	/** Holds the weapon tooltip template, as on the end screen. */
 	static inline final TOWN_SWF = "Resources/Art2D/UI/db_UI_town.swf";

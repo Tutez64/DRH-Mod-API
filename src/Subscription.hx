@@ -1,6 +1,7 @@
 package mods.api;
 
 import modding.ModContext;
+import mods.api._internal.Hub;
 
 /** What every `Context.on*` returns. `cancel` stops the handler; a second call does nothing. */
 class Subscription {
@@ -15,7 +16,7 @@ class Subscription {
 
 	var cancelled:Bool = false;
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function new(owner:ModContext, event:String, call:Dynamic) {
 		this.owner = owner;
 		this.event = event;

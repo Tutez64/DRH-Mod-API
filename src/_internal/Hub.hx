@@ -1,10 +1,16 @@
-package mods.api;
+package mods.api._internal;
 
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
 import modding.ModContext;
+import mods.api.account.Account;
+import mods.api.dungeon.Floor;
+import mods.api.dungeon.Hero;
+import mods.api.dungeon.Player;
+import mods.api.State;
+import mods.api.Subscription;
 import openfl.display.DisplayObjectContainer;
 
 /**

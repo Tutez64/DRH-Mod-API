@@ -1,9 +1,11 @@
-package mods.api;
+package mods.api.account;
 
 import facade.GameMasterLocale;
 import flash.display.Sprite;
 import gameMasterDictionary.GMRarity;
 import gameMasterDictionary.GMWeaponItem;
+import mods.api._internal.Art;
+import mods.api._internal.Hub;
 
 /** One weapon, copied when read: it does not follow later changes. */
 class Weapon {
@@ -37,7 +39,7 @@ class Weapon {
 	var legendaryModifier:UInt;
 
 	/** Names and rarity from the GameMaster, read now. */
-	@:allow(mods.api.Hero, mods.api.Inventory, mods.api.OwnedHero)
+	@:allow(mods.api.dungeon.Hero, mods.api.account.Inventory, mods.api.account.OwnedHero)
 	static function read(slot:Int, id:UInt, power:UInt, requiredLevel:UInt, rarityId:UInt, modifier1:UInt, modifier2:UInt,
 			legendaryModifier:UInt):Weapon {
 		var facade = Hub.facade();

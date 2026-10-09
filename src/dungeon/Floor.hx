@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api.dungeon;
 
 import distributedObjects.DistributedDungeonFloor;
 
@@ -14,7 +14,7 @@ class Floor {
 
 	var floor:DistributedDungeonFloor;
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function new(floor:DistributedDungeonFloor) {
 		this.floor = floor;
 		id = floor.id;

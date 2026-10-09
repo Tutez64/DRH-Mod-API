@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api.account;
 
 import facade.DBFacade;
 
@@ -60,7 +60,7 @@ class Account {
 		return info == null ? 0 : info.trophies;
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	static function from(facade:DBFacade):Null<Account> {
 		return facade == null || facade.dbAccountInfo == null ? null : new Account(facade);
 	}

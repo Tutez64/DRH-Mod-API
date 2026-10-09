@@ -1,6 +1,7 @@
 package mods.api;
 
 import modding.ModContext;
+import mods.api._internal.Hub;
 
 /** The `api` mod itself: turns the core's game events into the wrappers and events `Context` hands out. */
 class Main extends modding.Mod {

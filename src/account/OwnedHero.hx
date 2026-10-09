@@ -1,4 +1,4 @@
-package mods.api;
+package mods.api.account;
 
 import account.AvatarInfo;
 import account.DBInventoryInfo;
@@ -31,7 +31,7 @@ class OwnedHero {
 	/** Equipped consumables by slot, empty slots left out. */
 	public var consumables(default, null):Array<Stack> = [];
 
-	@:allow(mods.api.Inventory)
+	@:allow(mods.api.account.Inventory)
 	function new(avatar:AvatarInfo, inventory:DBInventoryInfo) {
 		id = avatar.id;
 		classId = avatar.avatarType;

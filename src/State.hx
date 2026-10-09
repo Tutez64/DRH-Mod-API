@@ -1,5 +1,10 @@
 package mods.api;
 
+import mods.api.account.Account;
+import mods.api.dungeon.Floor;
+import mods.api.dungeon.Hero;
+import mods.api.dungeon.Player;
+
 /**
  * Live window handed to every mod.
  *
@@ -36,32 +41,32 @@ class State {
 		return playerList.copy();
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function setAccount(value:Null<Account>):Void {
 		account = value;
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function setFloor(value:Null<Floor>):Void {
 		floor = value;
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function addHero(hero:Hero):Void {
 		heroList.push(hero);
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function removeHero(hero:Hero):Void {
 		heroList.remove(hero);
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function addPlayer(player:Player):Void {
 		playerList.push(player);
 	}
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function clearPlayers():Void {
 		playerList = [];
 	}

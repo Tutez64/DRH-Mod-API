@@ -1,6 +1,7 @@
-package mods.api;
+package mods.api.dungeon;
 
 import distributedObjects.HeroGameObject;
+import mods.api.account.Weapon;
 
 /**
  * One hero on a dungeon floor: what a player plays there. Each floor gives a new one. Fields read
@@ -29,7 +30,7 @@ class Hero {
 
 	var hero:HeroGameObject;
 
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function new(hero:HeroGameObject, local:Bool, player:Null<Player>) {
 		this.hero = hero;
 		this.local = local;
@@ -38,7 +39,7 @@ class Hero {
 	}
 
 	/** At `heroDespawned`, before its handlers: the player keeps what was last read, fields read empty from there on. */
-	@:allow(mods.api.Hub)
+	@:allow(mods.api._internal.Hub)
 	function detach():Void {
 		if (player != null && player.hero == this)
 			player.setHero(null);

@@ -1,6 +1,9 @@
 package mods.api;
 
 import modding.ModContext;
+import mods.api._internal.Hub;
+import mods.api.dungeon.Floor;
+import mods.api.dungeon.Hero;
 import openfl.display.Sprite;
 
 /**

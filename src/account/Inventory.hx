@@ -1,9 +1,10 @@
-package mods.api;
+package mods.api.account;
 
 import account.DBInventoryInfo;
 import account.ItemInfo;
 import account.PetInfo;
 import account.StackableInfo;
+import mods.api._internal.Hub;
 
 /**
  * What the account owns, read live from `ready`. Each list is a copy, in no particular order; what is
@@ -25,7 +26,7 @@ class Inventory {
 	/** Consumables in storage, not equipped: potions and bombs for the dungeon. Coin and XP boosters are not listed. */
 	public var consumables(get, never):Array<Stack>;
 
-	@:allow(mods.api.Account)
+	@:allow(mods.api.account.Account)
 	function new() {}
 
 	function inventory():Null<DBInventoryInfo> {
@@ -84,7 +85,7 @@ class Inventory {
 		return out;
 	}
 
-	@:allow(mods.api.OwnedHero)
+	@:allow(mods.api.account.OwnedHero)
 	static function weapon(item:ItemInfo, slot:Int):Weapon {
 		var rarity = item.rarity;
 		var modifiers = item.modifiers;
@@ -92,14 +93,14 @@ class Inventory {
 			modifiers.length > 0 ? modifiers[0].Id : 0, modifiers.length > 1 ? modifiers[1].Id : 0, item.legendaryModifier);
 	}
 
-	@:allow(mods.api.OwnedHero)
+	@:allow(mods.api.account.OwnedHero)
 	static function pet(info:PetInfo):Pet {
 		var npc = info.gmNpc;
 		return npc == null ? new Pet(info.PetType, "", 0, 0, 0) : new Pet(info.PetType, npc.Name == null ? "" : npc.Name, npc.AttackRating,
 			npc.DefenseRating, npc.SpeedRating);
 	}
 
-	@:allow(mods.api.OwnedHero)
+	@:allow(mods.api.account.OwnedHero)
 	static function stack(info:StackableInfo):Stack {
 		var gm = info.gmStackable;
 		return new Stack(info.gmId, gm == null || gm.Name == null ? "" : gm.Name, info.count);
