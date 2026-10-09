@@ -1,9 +1,6 @@
 package mods.api;
 
 import distributedObjects.HeroGameObject;
-import facade.GameMasterLocale;
-import gameMasterDictionary.GMRarity;
-import gameMasterDictionary.GMWeaponItem;
 
 /**
  * One hero on a dungeon floor: what a player plays there. Each floor gives a new one. Fields read
@@ -72,26 +69,14 @@ class Hero {
 	function get_weapons():Array<Weapon> {
 		var out:Array<Weapon> = [];
 		var live = live();
-		var facade = Hub.facade();
-		if (live == null || facade == null || facade.gameMaster == null)
-			return out;
-		var details = @:privateAccess live.mWeaponDetails;
+		var details = live == null ? null : @:privateAccess live.mWeaponDetails;
 		if (details == null)
 			return out;
 		for (slot in 0...details.length) {
 			var detail = details[slot];
 			if (detail == null || detail.type == 0)
 				continue;
-			var item:GMWeaponItem = cast facade.gameMaster.weaponItemById.itemFor(detail.type);
-			var name = "";
-			if (item != null) {
-				var aesthetic = item.getWeaponAesthetic(detail.requiredlevel, detail.legendarymodifier > 0);
-				name = aesthetic != null ? GameMasterLocale.getGameMasterSubString("WEAPON_AESTHETIC_NAME", aesthetic.Constant) : item.Name;
-			}
-			var rarity:GMRarity = cast facade.gameMaster.rarityById.itemFor(detail.rarity);
-			var color:UInt = rarity != null && rarity.TextColor != 0 ? rarity.TextColor : 15463921;
-			out.push(new Weapon(slot, detail.type, name == null ? "" : name, detail.power, detail.requiredlevel,
-				rarity == null || rarity.Constant == null ? "" : rarity.Constant, color, detail.rarity, detail.modifier1, detail.modifier2,
+			out.push(Weapon.read(slot, detail.type, detail.power, detail.requiredlevel, detail.rarity, detail.modifier1, detail.modifier2,
 				detail.legendarymodifier));
 		}
 		return out;

@@ -12,6 +12,15 @@ class Account {
 	/** The avatar selected in town, 0 when there is none. Follows a change of selection. */
 	public var activeAvatarId(get, never):UInt;
 
+	public var coins(get, never):UInt;
+
+	public var gems(get, never):UInt;
+
+	public var trophies(get, never):UInt;
+
+	/** What the account owns. */
+	public var inventory(default, null):Inventory = new Inventory();
+
 	var facade:DBFacade;
 
 	function new(facade:DBFacade) {
@@ -34,6 +43,21 @@ class Account {
 			return 0;
 		var avatar = info.activeAvatarInfo;
 		return avatar == null ? 0 : avatar.id;
+	}
+
+	function get_coins():UInt {
+		var info = facade.dbAccountInfo;
+		return info == null ? 0 : info.basicCurrency;
+	}
+
+	function get_gems():UInt {
+		var info = facade.dbAccountInfo;
+		return info == null ? 0 : info.premiumCurrency;
+	}
+
+	function get_trophies():UInt {
+		var info = facade.dbAccountInfo;
+		return info == null ? 0 : info.trophies;
 	}
 
 	@:allow(mods.api.Hub)
