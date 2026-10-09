@@ -1,8 +1,12 @@
 # DRH Mod API
 
-The official API of [Dungeon Rampage Haxe](https://github.com/Tutez64/Dungeon-Rampage-Haxe), which every mod builds on: stable wrappers and events for heroes, floors, the signed-in account and more.
+The official API of [Dungeon Rampage Haxe](https://github.com/Tutez64/Dungeon-Rampage-Haxe) every mod builds on: a stable layer over the game, so mods keep working across its updates.
 
-This repository is the mod's folder: clone it into a mods folder as `api/` and it runs as is. Players never install it by hand: DRH Launcher installs it with the mods that need it.
+[DRH Launcher](https://github.com/Tutez64/DRH-Launcher) installs it with the mods that need it.
+
+## For modders
+
+This repository is the mod's folder: clone it into a mods folder as `api/` and it runs as is.
 
 A mod names the version it needs in its `mod.json` (`"api": "1.0"`) and its entry extends `mods.api.Mod`:
 
