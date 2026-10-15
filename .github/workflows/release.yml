@@ -15,4 +15,4 @@ jobs:
     # pre-release. Then @v1, without drhl-version, as DRH-Mods-Template.
     uses: Tutez64/DRH-Mods-Workflows/.github/workflows/release.yml@master
     with:
-      drhl-version: v0.4.0-alpha.1
+      drhl-version: v0.4.0-alpha.2
