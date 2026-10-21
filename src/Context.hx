@@ -17,6 +17,13 @@ class Context {
 	/** This mod's layer of the overlay, above the letterbox and stacked in load order. Removed if the mod fails. */
 	public var overlay(get, never):Sprite;
 
+	/**
+	 * This mod's `Resources/` folder, absolute and without a trailing slash, where it reads its own
+	 * files, such as `BitmapData.fromFile(resources + "/icon.png")`; the only ones its release holds
+	 * besides its code. They never replace the game's.
+	 */
+	public var resources(get, never):String;
+
 	/** The live window: account, floor, heroes, players. Shared by every mod. */
 	public var state(get, never):State;
 
@@ -35,6 +42,10 @@ class Context {
 
 	function get_overlay():Sprite {
 		return core.overlay;
+	}
+
+	function get_resources():String {
+		return core.resources;
 	}
 
 	function get_state():State {
