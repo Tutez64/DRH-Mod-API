@@ -24,6 +24,13 @@ class Context {
 	 */
 	public var resources(get, never):String;
 
+	/**
+	 * This mod's folder to write in, such as its settings, absolute and without a trailing slash:
+	 * `data/<id>/` in the mods folder, created on first read. Kept when the mod is updated or
+	 * uninstalled, unlike its own folder.
+	 */
+	public var data(get, never):String;
+
 	/** The live window: account, floor, heroes, players. Shared by every mod. */
 	public var state(get, never):State;
 
@@ -46,6 +53,10 @@ class Context {
 
 	function get_resources():String {
 		return core.resources;
+	}
+
+	function get_data():String {
+		return core.data;
 	}
 
 	function get_state():State {
