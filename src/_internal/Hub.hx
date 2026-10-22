@@ -1,5 +1,8 @@
 package mods.api._internal;
 
+import brain.gameObject.GameObject;
+import brain.stateMachine.State;
+import brain.stateMachine.StateMachine;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
@@ -12,6 +15,7 @@ import mods.api.dungeon.Player;
 import mods.api.State;
 import mods.api.Subscription;
 import openfl.display.DisplayObjectContainer;
+import stateMachine.mainStateMachine.TownState;
 
 /**
  * The `api` mod's shared side: the live state, the game's facade, and every mod's subscriptions. Not
@@ -54,13 +58,37 @@ class Hub {
 
 	static function start(ctx:ModContext):Void {
 		core = ctx;
-		ctx.onHeroSpawned(heroSpawned);
-		ctx.onHeroDespawned(heroDespawned);
-		ctx.onFloorEnter(floorEnter);
-		ctx.onFloorExit(floorExit);
+		ctx.onObjectReady(objectReady);
+		ctx.onObjectGone(objectGone);
+		ctx.onStateEnter(stateEnter);
+		ctx.onStateExit(stateExit);
 		ctx.onTablesLoaded(function() emit(TABLES_LOADED, null));
-		ctx.onTownEnter(townEnter);
-		ctx.onTownExit(function() emit(TOWN_EXIT, null));
+	}
+
+	/** The core's ready objects, as the api's events: a hero always after its floor. */
+	static function objectReady(object:GameObject):Void {
+		if (Std.isOfType(object, HeroGameObject))
+			heroSpawned(cast object);
+		else if (Std.isOfType(object, DistributedDungeonFloor))
+			floorEnter(cast object);
+	}
+
+	/** While the object is still whole. */
+	static function objectGone(object:GameObject):Void {
+		if (Std.isOfType(object, HeroGameObject))
+			heroDespawned(cast object);
+		else if (Std.isOfType(object, DistributedDungeonFloor))
+			floorExit(cast object);
+	}
+
+	static function stateEnter(machine:StateMachine, state:State):Void {
+		if (Std.isOfType(state, TownState))
+			townEnter();
+	}
+
+	static function stateExit(machine:StateMachine, state:State):Void {
+		if (Std.isOfType(state, TownState))
+			emit(TOWN_EXIT, null);
 	}
 
 	static function ready():Void {
