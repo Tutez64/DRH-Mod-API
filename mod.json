@@ -2,7 +2,7 @@
   "id": "api",
   "name": "API",
   "description": "The official API every mod builds on: a stable layer over the game, so mods keep working across its updates.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Tutez",
   "drh": "14",
   "entry": "Main",
