@@ -12,6 +12,12 @@ class Floor {
 	/** GameMaster map-node constant, empty when the floor is already gone. */
 	public var map(get, never):String;
 
+	/**
+	 * The floor's tiles as the server laid them out, read now: a copy. Filler the server sends is in it,
+	 * not the filler the game adds on its own around the floor. Empty once the floor is gone.
+	 */
+	public var tiles(get, never):Array<Tile>;
+
 	var floor:DistributedDungeonFloor;
 
 	@:allow(mods.api._internal.Hub)
@@ -33,5 +39,23 @@ class Floor {
 		if (node == null || node.Constant == null)
 			return "";
 		return node.Constant;
+	}
+
+	function get_tiles():Array<Tile> {
+		var out:Array<Tile> = [];
+		if (floor == null || floor.isDestroyed)
+			return out;
+		var usages = @:privateAccess floor.mTileNetworkComponents;
+		var factory = floor.dungeonFloorFactory == null ? null : floor.dungeonFloorFactory.tileFactory;
+		var library = factory == null ? null : @:privateAccess factory.mTileMap;
+		if (usages == null)
+			return out;
+		for (i in 0...usages.length) {
+			var usage = usages[i];
+			var json:Dynamic = library == null ? null : library.itemFor(usage.tileId);
+			var category:Null<String> = json == null ? null : json.category;
+			out.push(new Tile(usage.x, usage.y, usage.tileId == null ? "" : usage.tileId, category == null ? "" : category));
+		}
+		return out;
 	}
 }

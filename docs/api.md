@@ -2,7 +2,7 @@
 
 Everything the `api` mod offers, by what a mod does with it. Its version covers this text: a fix is a patch, an addition a minor, a change to what is written here a major ([Versioning](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#versioning)). Each release's notes list what it added. The steps to make a mod are in [Making a mod](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/making-a-mod.md).
 
-Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Hero`, `Player`) and `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`). `mods.api._internal` is not part of it.
+Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Hero`, `Player`) and `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`). `mods.api._internal` is not part of it.
 
 A mod written only against this page is a stable-only mod, labelled `API` in the launcher: it keeps working across DRH updates as long as the `api` major does not change. Drawing on the overlay with OpenFL is part of it. Anything else of the game is [beyond the `api`](#beyond-the-api).
 
@@ -68,6 +68,19 @@ A hero and its player are two objects: a `Hero` is what a player plays on one fl
 | `id` | The floor's object id. |
 | `number` | 1-based index of the floor inside its dungeon. |
 | `map` | The game's map node constant; empty once the floor is gone. |
+| `tiles` | Its [tiles](#tile) as the server laid them out, read now: the whole floor from the start, rooms not reached yet included. Filler the server sends is in it, not the filler the game adds on its own around the floor. Empty once the floor is gone. A copy. |
+
+### Tile
+
+A square room of a floor, copied when read.
+
+| Member | What |
+| --- | --- |
+| `x`, `y` | World position of its top-left corner, in the coordinates of a hero's `x` and `y`. |
+| `SIZE` | Side of every tile, 900. |
+| `id` | Its id in the floor's tile library. |
+| `category` | `STARTING_TILE`, `BASIC_TILE`, `EXIT_TILE`, `BOSS_TILE`, `PUZZLE_TILE`, `SECRET_TILE`, `TRAP_TILE` or `FILLER_TILE`, as the library says; empty when unknown. |
+| `contains(x, y)` | Whether a world point is inside it, such as a hero's position. |
 
 ### Hero
 
