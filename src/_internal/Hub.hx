@@ -8,6 +8,7 @@ import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
 import facade.DBFacade;
 import modding.ModContext;
+import modding.ModSubscription;
 import mods.api.account.Account;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
@@ -56,6 +57,12 @@ class Hub {
 
 	static var floors:Map<String, Floor> = new Map();
 
+	/** Floors ready without their tiles yet, which the server sends after them from the second floor on. */
+	static var tileless:Array<DistributedDungeonFloor> = [];
+
+	/** Listens to the fields the server sends while a floor waits for its tiles. */
+	static var tilesWatch:Null<ModSubscription>;
+
 	static function start(ctx:ModContext):Void {
 		core = ctx;
 		ctx.onObjectReady(objectReady);
@@ -70,7 +77,7 @@ class Hub {
 		if (Std.isOfType(object, HeroGameObject))
 			heroSpawned(cast object);
 		else if (Std.isOfType(object, DistributedDungeonFloor))
-			floorEnter(cast object);
+			floorReady(cast object);
 	}
 
 	/** While the object is still whole. */
@@ -184,6 +191,12 @@ class Hub {
 		var key = Std.string(object.id);
 		if (heroes.exists(key))
 			return;
+		// A hero always comes after its floor, tiles or not.
+		var floor = object.distributedDungeonFloor;
+		if (floor != null && tileless.indexOf(floor) >= 0) {
+			log("floor " + floor.id + " entered without its tiles");
+			floorEnter(floor);
+		}
 		var local = Std.isOfType(object, HeroGameObjectOwner);
 		var account:UInt = object.playerID;
 		var player:Null<Player> = null;
@@ -215,7 +228,39 @@ class Hub {
 		hero.detach();
 	}
 
+	/** A floor enters once it has its tiles. */
+	static function floorReady(object:DistributedDungeonFloor):Void {
+		if (hasTiles(object)) {
+			floorEnter(object);
+			return;
+		}
+		tileless.push(object);
+		if (tilesWatch == null && core != null)
+			tilesWatch = core.onFieldReceived(fieldReceived);
+	}
+
+	static function fieldReceived(object:GameObject, field:UInt, name:String):Void {
+		var floor = Std.downcast(object, DistributedDungeonFloor);
+		if (floor != null && tileless.indexOf(floor) >= 0 && hasTiles(floor))
+			floorEnter(floor);
+	}
+
+	static function hasTiles(object:DistributedDungeonFloor):Bool {
+		var tiles = @:privateAccess object.mTileNetworkComponents;
+		return tiles != null && tiles.length > 0;
+	}
+
+	/** No longer waiting for its tiles; the watch stops with the last such floor. */
+	static function settle(object:DistributedDungeonFloor):Void {
+		tileless.remove(object);
+		if (tileless.length == 0 && tilesWatch != null) {
+			tilesWatch.cancel();
+			tilesWatch = null;
+		}
+	}
+
 	static function floorEnter(object:DistributedDungeonFloor):Void {
+		settle(object);
 		var floor = new Floor(object);
 		floors.set(Std.string(object.id), floor);
 		state.setFloor(floor);
@@ -223,6 +268,7 @@ class Hub {
 	}
 
 	static function floorExit(object:DistributedDungeonFloor):Void {
+		settle(object);
 		var key = Std.string(object.id);
 		var floor = floors.get(key);
 		if (floor == null)
