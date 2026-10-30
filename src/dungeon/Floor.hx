@@ -54,7 +54,9 @@ class Floor {
 			var usage = usages[i];
 			var json:Dynamic = library == null ? null : library.itemFor(usage.tileId);
 			var category:Null<String> = json == null ? null : json.category;
-			out.push(new Tile(usage.x, usage.y, usage.tileId == null ? "" : usage.tileId, category == null ? "" : category));
+			var sides:Dynamic = json == null ? null : json.exits;
+			var exits = [for (side in 0...4) sides != null && side < sides.length && sides[side] != null && sides[side] != 0];
+			out.push(new Tile(usage.x, usage.y, usage.tileId == null ? "" : usage.tileId, category == null ? "" : category, exits));
 		}
 		return out;
 	}

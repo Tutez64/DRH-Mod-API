@@ -80,6 +80,7 @@ A square room of a floor, copied when read.
 | `SIZE` | Side of every tile, 900. |
 | `id` | Its id in the floor's tile library. |
 | `category` | `STARTING_TILE`, `BASIC_TILE`, `EXIT_TILE`, `BOSS_TILE`, `PUZZLE_TILE`, `SECRET_TILE`, `TRAP_TILE` or `FILLER_TILE`, as the library says; empty when unknown. |
+| `exits` | Its open sides, indexed by `UP`, `RIGHT`, `DOWN` and `LEFT`, as the library says. Two tiles are joined only when both facing sides are open; a boss arena spanning several tiles can have none and still be open. |
 | `contains(x, y)` | Whether a world point is inside it, such as a hero's position. |
 
 ### Hero
