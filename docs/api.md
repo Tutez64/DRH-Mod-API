@@ -80,6 +80,7 @@ Fields read the live hero and go empty after the `onHeroDespawned` handlers.
 | `player` | Its [Player](#player); null only if the game sent no account for it. |
 | `classId`, `className` | The hero class: the game's id and the name it shows. |
 | `level` | |
+| `x`, `y` | World position; 0 once gone. |
 | `weapons` | Equipped [weapons](#weapon) by slot, empty slots left out. A copy. |
 
 ### Player

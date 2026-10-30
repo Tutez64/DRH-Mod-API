@@ -25,6 +25,11 @@ class Hero {
 
 	public var level(get, never):UInt;
 
+	/** World position; 0 once the hero is gone. */
+	public var x(get, never):Float;
+
+	public var y(get, never):Float;
+
 	/** Equipped weapons by slot, empty slots left out. A copy. */
 	public var weapons(get, never):Array<Weapon>;
 
@@ -70,6 +75,16 @@ class Hero {
 	function get_level():UInt {
 		var live = live();
 		return live == null ? 0 : live.level;
+	}
+
+	function get_x():Float {
+		var live = live();
+		return live == null ? 0 : live.position.x;
+	}
+
+	function get_y():Float {
+		var live = live();
+		return live == null ? 0 : live.position.y;
 	}
 
 	function get_weapons():Array<Weapon> {
