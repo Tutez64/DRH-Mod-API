@@ -1,6 +1,8 @@
 package mods.api.dungeon;
 
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
+import distributedObjects.NPCGameObject;
 
 /** The dungeon floor in progress. Not town. */
 class Floor {
@@ -17,6 +19,15 @@ class Floor {
 	 * not the filler the game adds on its own around the floor. Empty once the floor is gone.
 	 */
 	public var tiles(get, never):Array<Tile>;
+
+	/**
+	 * The heroes' living enemies the game knows on the floor, read now: a copy. Rooms not reached yet
+	 * are in it, monsters a generator spawns later too, and anything of the foes' team, such as the
+	 * Cracked Walls guarding the Golem in Twisted Jungle Boss or the Barrel Monsters of Knight Fortress
+	 * Boss; not breakable props, nor traps that hurt everyone. None yet at `onFloorEnter`; empty once the
+	 * floor is gone.
+	 */
+	public var monsters(get, never):Array<Monster>;
 
 	var floor:DistributedDungeonFloor;
 
@@ -57,6 +68,30 @@ class Floor {
 			var sides:Dynamic = json == null ? null : json.exits;
 			var exits = [for (side in 0...4) sides != null && side < sides.length && sides[side] != null && sides[side] != 0];
 			out.push(new Tile(usage.x, usage.y, usage.tileId == null ? "" : usage.tileId, category == null ? "" : category, exits));
+		}
+		return out;
+	}
+
+	function get_monsters():Array<Monster> {
+		var out:Array<Monster> = [];
+		if (floor == null || floor.isDestroyed || floor.remoteActors == null)
+			return out;
+		var avatar = floor.activeOwnerAvatar;
+		var heroes:Int = avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team;
+		for (actor in floor.remoteActors.toArray()) {
+			if (!Std.isOfType(actor, NPCGameObject))
+				continue;
+			var npc:NPCGameObject = cast actor;
+			if (npc.isDestroyed || npc.isDead())
+				continue;
+			// Teams besides the heroes': props (environment), and traps that hurt everyone (the third team).
+			var team = npc.team;
+			if (team == heroes || team == (DBGlobal.TEAM_ENVIRONMENT : Int) || team == (DBGlobal.TEAM_3 : Int))
+				continue;
+			var position = npc.position;
+			var gm = npc.gmNpc;
+			out.push(new Monster(npc.id, gm == null || gm.Name == null ? "" : gm.Name, position == null ? 0 : position.x,
+				position == null ? 0 : position.y, gm != null && gm.HasHealthbar));
 		}
 		return out;
 	}

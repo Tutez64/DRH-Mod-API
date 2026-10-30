@@ -2,7 +2,7 @@
 
 Everything the `api` mod offers, by what a mod does with it. Its version covers this text: a fix is a patch, an addition a minor, a change to what is written here a major ([Versioning](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#versioning)). Each release's notes list what it added. The steps to make a mod are in [Making a mod](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/making-a-mod.md).
 
-Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Hero`, `Player`) and `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`). `mods.api._internal` is not part of it.
+Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`) and `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`). `mods.api._internal` is not part of it.
 
 A mod written only against this page is a stable-only mod, labelled `API` in the launcher: it keeps working across DRH updates as long as the `api` major does not change. Drawing on the overlay with OpenFL is part of it. Anything else of the game is [beyond the `api`](#beyond-the-api).
 
@@ -69,6 +69,7 @@ A hero and its player are two objects: a `Hero` is what a player plays on one fl
 | `number` | 1-based index of the floor inside its dungeon. |
 | `map` | The game's map node constant; empty once the floor is gone. |
 | `tiles` | Its [tiles](#tile) as the server laid them out, read now: the whole floor from the start, rooms not reached yet included. Filler the server sends is in it, not the filler the game adds on its own around the floor. Empty once the floor is gone. A copy. |
+| `monsters` | The heroes' living [enemies](#monster) the game knows on the floor, read now: rooms not reached yet included, and those a generator spawns later. Anything of the foes' team, such as the Cracked Walls guarding the Golem in Twisted Jungle Boss or the Barrel Monsters of Knight Fortress Boss; not breakable props, nor traps that hurt everyone. None yet at `onFloorEnter`; empty once the floor is gone. A copy. |
 
 ### Tile
 
@@ -82,6 +83,17 @@ A square room of a floor, copied when read.
 | `category` | `STARTING_TILE`, `BASIC_TILE`, `EXIT_TILE`, `BOSS_TILE`, `PUZZLE_TILE`, `SECRET_TILE`, `TRAP_TILE` or `FILLER_TILE`, as the library says; empty when unknown. |
 | `exits` | Its open sides, indexed by `UP`, `RIGHT`, `DOWN` and `LEFT`, as the library says. Two tiles are joined only when both facing sides are open; a boss arena spanning several tiles can have none and still be open. |
 | `contains(x, y)` | Whether a world point is inside it, such as a hero's position. |
+
+### Monster
+
+A living enemy of the heroes, copied when read. The game has no reliable notion of a boss: tell one by its `name`, and its dungeon by the floor's `map`.
+
+| Member | What |
+| --- | --- |
+| `id` | Its object id on the floor, the same from one read to the next. |
+| `name` | Its name in the game's data, such as `Golem Boss`. |
+| `x`, `y` | World position, in the coordinates of a hero's `x` and `y`. |
+| `healthBar` | Whether the game shows a health bar over it, as it does for the big ones: bosses, minibosses, and some others. |
 
 ### Hero
 
