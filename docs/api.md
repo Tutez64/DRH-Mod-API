@@ -55,6 +55,7 @@ Order: `init`, `onTablesLoaded`, `ready`, then everything else. A hero always co
 | Member | What |
 | --- | --- |
 | `account` | [Account](#account), null until `ready`. |
+| `inTown` | Whether the game is in town: true from `onTownEnter` to `onTownExit`. |
 | `floor` | The dungeon [Floor](#floor) in progress; null in town. |
 | `heroes` | The [heroes](#hero) on the floor, local and remote. A copy. |
 | `players` | The [players](#player) met in the dungeon in progress, in order of arrival, those who left included; emptied on `onTownEnter`. A copy. |

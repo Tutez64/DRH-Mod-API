@@ -1,5 +1,6 @@
 package mods.api;
 
+import mods.api._internal.Hub;
 import mods.api.account.Account;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
@@ -14,6 +15,9 @@ import mods.api.dungeon.Player;
 class State {
 	/** Account-level reading. Null until `ready`. */
 	public var account(default, null):Null<Account>;
+
+	/** Whether the game is in town: true from `onTownEnter` to `onTownExit`. */
+	public var inTown(get, never):Bool;
 
 	/** Dungeon floor in progress. Null in town and until `floorEnter`. */
 	public var floor(default, null):Null<Floor>;
@@ -32,6 +36,10 @@ class State {
 	var playerList:Array<Player> = [];
 
 	public function new() {}
+
+	function get_inTown():Bool {
+		return Hub.inTown;
+	}
 
 	function get_heroes():Array<Hero> {
 		return heroList.copy();
