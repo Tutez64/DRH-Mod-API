@@ -13,8 +13,9 @@ import gameMasterDictionary.GMWeaponItem;
 import uI.inventory.UIWeaponTooltip;
 
 /**
- * Game art handed to mods as plain sprites. Each sprite loads its art itself and releases it when
- * removed from its parent. Not for mods: they go through `Weapon` and `Hero`.
+ * Game art handed to mods as plain sprites. Each sprite loads its art itself. Removed from its parent,
+ * it stops a load still in progress and destroys its tooltip; otherwise the GC takes it like any
+ * sprite, since the swfs stay in the game's cache. Not for mods: they go through `Weapon` and `Hero`.
  */
 @:allow(mods.api.account.Weapon)
 @:allow(mods.api.dungeon.Player)

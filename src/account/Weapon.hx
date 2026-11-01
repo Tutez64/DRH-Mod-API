@@ -77,8 +77,8 @@ class Weapon {
 
 	/**
 	 * The game's icon for this weapon on its rarity background, centred in a `size` square. Hovering
-	 * it shows the game's weapon tooltip. The art appears once loaded, and is released when the sprite
-	 * is removed from its parent. Empty before `ready`.
+	 * it shows the game's weapon tooltip. The art appears once loaded; it needs no cleanup: drop it like
+	 * any sprite. Empty before `ready`.
 	 */
 	public function createIcon(size:Float):Sprite {
 		return Art.weaponIcon(id, power, requiredLevel, rarityId, modifier1, modifier2, legendaryModifier, size);

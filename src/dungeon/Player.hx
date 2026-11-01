@@ -84,7 +84,7 @@ class Player {
 
 	/**
 	 * The player's picture, as on the end screen: the icon of their hero's skin, centred in a `size`
-	 * square. Released when removed from its parent.
+	 * square. It needs no cleanup: drop it like any sprite.
 	 */
 	public function createPortrait(size:Float):Sprite {
 		remember();

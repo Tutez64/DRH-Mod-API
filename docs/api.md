@@ -196,7 +196,7 @@ Some of one stackable item, such as a potion or a bomb.
 
 ## Drawing
 
-Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and `viewHeight`, which change with the window. `createPortrait` and `createIcon` return OpenFL `Sprite`s for the overlay: their art appears once loaded, and is released when the sprite is removed from its parent.
+Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and `viewHeight`, which change with the window. `createPortrait` and `createIcon` return OpenFL `Sprite`s for the overlay: their art appears once loaded. They need no cleanup: drop them like any sprite.
 
 ## Beyond the `api`
 
