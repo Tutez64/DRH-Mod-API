@@ -17,6 +17,7 @@ import mods.api.State;
 import mods.api.Subscription;
 import openfl.display.DisplayObjectContainer;
 import stateMachine.mainStateMachine.TownState;
+import town.MapTownSubState;
 
 /**
  * The `api` mod's shared side: the live state, the game's facade, and every mod's subscriptions. Not
@@ -48,6 +49,18 @@ class Hub {
 	static var listeners:Map<String, Array<Subscription>> = new Map();
 
 	static var keysHooked:Bool = false;
+
+	/** Between the town's enter and exit. */
+	static var inTown:Bool = false;
+
+	/** While the world map is open in town. */
+	static var onMap:Bool = false;
+
+	/** The hero selected as the server last answered: another one selected now is still being saved. */
+	static var savedAvatar:UInt = 0;
+
+	/** What waits for the selected hero to be saved. */
+	static var afterSave:Array<Void->Void> = [];
 
 	/** Heroes on a floor now, by object id. */
 	static var heroes:Map<String, Hero> = new Map();
@@ -91,15 +104,45 @@ class Hub {
 	static function stateEnter(machine:StateMachine, state:State):Void {
 		if (Std.isOfType(state, TownState))
 			townEnter();
+		else if (Std.isOfType(state, MapTownSubState))
+			onMap = true;
 	}
 
 	static function stateExit(machine:StateMachine, state:State):Void {
-		if (Std.isOfType(state, TownState))
+		if (Std.isOfType(state, TownState)) {
+			inTown = false;
 			emit(TOWN_EXIT, null);
+		} else if (Std.isOfType(state, MapTownSubState))
+			onMap = false;
 	}
 
 	static function ready():Void {
 		state.setAccount(Account.from(facade()));
+		savedAvatar = selectedAvatar();
+		// The game sends it on each answer of the server about the account, the selected hero read from it.
+		var facade = facade();
+		if (facade != null)
+			facade.eventManager.addEventListener("ACTIVE_AVATAR_CHANGED_EVENT", function(_) {
+				savedAvatar = selectedAvatar();
+				var waiting = afterSave;
+				afterSave = [];
+				for (run in waiting)
+					run();
+			});
+	}
+
+	static function selectedAvatar():UInt {
+		var facade = facade();
+		var account = facade == null ? null : facade.dbAccountInfo;
+		return account == null || account.activeAvatarInfo == null ? 0 : account.activeAvatarInfo.id;
+	}
+
+	/** Runs `run` once the selected hero is saved: now, or on the server's answer. */
+	static function whenSaved(run:Void->Void):Void {
+		if (selectedAvatar() == savedAvatar)
+			run();
+		else
+			afterSave.push(run);
 	}
 
 	/** The game's facade, null before `ready`. */
@@ -284,6 +327,7 @@ class Hub {
 	}
 
 	static function townEnter():Void {
+		inTown = true;
 		players = new Map();
 		state.clearPlayers();
 		emit(TOWN_ENTER, null);

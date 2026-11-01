@@ -160,6 +160,9 @@ A hero of the account, copied when read, with what it carries into a dungeon; no
 | `classId`, `className`, `level` | As on `Hero`. |
 | `skinId` | The game's skin id. |
 | `weapons`, `pets`, `consumables` | Equipped, by slot, empty slots left out. |
+| `equipPet(pet, ?done)` | Equips the pet on this hero, in town, as the inventory does but without its popup: the pet this hero carries goes back to storage, and `pet` leaves the hero carrying it. `done` runs once: true once the server accepted, false on an error, which the game shows. |
+
+`equipPet` returns false when there is nothing to do: out of town, `pet` already on this hero or not the account's, or a move still in progress, of any mod.
 
 ### Weapon
 
@@ -178,6 +181,7 @@ Copied when read: it does not follow later changes.
 | Member | What |
 | --- | --- |
 | `id`, `name` | The game's id of the pet's kind, and its name as the inventory shows it. |
+| `uid` | This pet's own id in the account, unlike `id`, which every pet of its kind shares. |
 | `attackRating`, `defenseRating`, `speedRating` | |
 
 ### Stack

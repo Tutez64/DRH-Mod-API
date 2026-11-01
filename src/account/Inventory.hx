@@ -96,8 +96,9 @@ class Inventory {
 	@:allow(mods.api.account.OwnedHero)
 	static function pet(info:PetInfo):Pet {
 		var npc = info.gmNpc;
-		return npc == null ? new Pet(info.PetType, "", 0, 0, 0) : new Pet(info.PetType, npc.Name == null ? "" : npc.Name, npc.AttackRating,
-			npc.DefenseRating, npc.SpeedRating);
+		if (npc == null)
+			return new Pet(info.PetType, info.databaseId, "", 0, 0, 0);
+		return new Pet(info.PetType, info.databaseId, npc.Name == null ? "" : npc.Name, npc.AttackRating, npc.DefenseRating, npc.SpeedRating);
 	}
 
 	@:allow(mods.api.account.OwnedHero)
