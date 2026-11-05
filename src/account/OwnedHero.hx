@@ -22,6 +22,7 @@ class OwnedHero {
 	/** Name of the hero class, as the game shows it. */
 	public var className(default, null):String;
 
+	/** Level as the game shows it, past 100 with ascension. */
 	public var level(default, null):UInt;
 
 	/** GameMaster skin id. */
@@ -45,7 +46,7 @@ class OwnedHero {
 		classId = avatar.avatarType;
 		var gm = avatar.gmHero;
 		className = gm == null || gm.Name == null ? "" : gm.Name;
-		level = avatar.level;
+		level = avatar.cloutLevel;
 		skinId = avatar.skinId;
 		for (item in inventory.getEquipedItemsOnAvatar(id))
 			weapons.push(Inventory.weapon(item, item.avatarSlot));
