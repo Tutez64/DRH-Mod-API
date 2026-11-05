@@ -99,7 +99,8 @@ class Player {
 		var info = facade.dbAccountInfo;
 		var rpc = JSONRPCService.getFunction("DRFriendRequest", facade.rpcRoot + "friendrequests");
 		var onError = UIFriendManager.createFriendRPCErrorCallback(facade, "api addFriend");
-		rpc(info.name, info.trophies, info.activeAvatarSkinId, info.facebookId, info.id, accountId, facade.demographics, facade.validationToken,
+		// no Facebook id since 1.0: null, as the end screen sends
+		rpc(info.name, info.trophies, info.activeAvatarSkinId, null, info.id, accountId, facade.demographics, facade.validationToken,
 			function(result:Dynamic) {
 				if (!answered(result))
 					return;
