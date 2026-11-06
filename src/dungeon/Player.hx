@@ -124,7 +124,8 @@ class Player {
 		if (facade == null)
 			return false;
 		var person = name;
-		var popup = new DBUITwoButtonPopup(facade, Locale.getString("BLOCK") + " " + person + "?",
+		// The layer name, new in 1.0, registers the popup with the controller navigation.
+		var popup = new DBUITwoButtonPopup(facade, "API_BLOCK_PLAYER_POPUP", Locale.getString("BLOCK") + " " + person + "?",
 			person + Locale.getString("VICTORY_SCREEN_BLOCK_POPUP_MESSAGE"), Locale.getString("BLOCK"), function() {
 				var rpc = JSONRPCService.getFunction("IgnoreFriend", facade.rpcRoot + "friendrequests");
 				rpc(facade.dbAccountInfo.id, accountId, facade.validationToken, function(result:Dynamic) {
