@@ -60,9 +60,9 @@ Order: `init`, `onTablesLoaded`, `ready`, then everything else. A hero always co
 | `inTown` | Whether the game is in town: true from `onTownEnter` to `onTownExit`. |
 | `floor` | The dungeon [Floor](#floor) in progress; null in town. |
 | `heroes` | The [heroes](#hero) on the floor, local and remote. A copy. |
-| `players` | The [players](#player) met in the dungeon in progress, in order of arrival, those who left included; emptied on `onTownEnter`. A copy. |
+| `players` | The [players](#player) met in the dungeon in progress, in order of arrival, those who left included; emptied when it is left, for the town (before `onTownEnter`) or for another dungeon. A copy. |
 
-A hero and its player are two objects: a `Hero` is what a player plays on one floor, and each floor gives a new one; its `Player` is the account behind it, the same from its first hero to the return to town.
+A hero and its player are two objects: a `Hero` is what a player plays on one floor, and each floor gives a new one; its `Player` is the account behind it, the same from its first hero to the end of the dungeon.
 
 ### Floor
 

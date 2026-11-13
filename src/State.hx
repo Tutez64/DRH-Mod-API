@@ -26,8 +26,8 @@ class State {
 	public var heroes(get, never):Array<Hero>;
 
 	/**
-	 * Players met in the dungeon in progress, in order of arrival, those who left included. Emptied on
-	 * `townEnter`. A copy.
+	 * Players met in the dungeon in progress, in order of arrival, those who left included. Emptied
+	 * when it is left, for the town or for another dungeon. A copy.
 	 */
 	public var players(get, never):Array<Player>;
 

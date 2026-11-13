@@ -15,7 +15,7 @@ import uI.popup.UIReportPopup;
 
 /**
  * A player met in the dungeon in progress, the local one included. One instance per account from
- * its first hero until the return to town, kept after the player has left: `hero` is then null,
+ * its first hero until the dungeon is left, kept after the player has left: `hero` is then null,
  * and the rest holds what was last read from their hero.
  *
  * `addFriend`, `block` and `report` act as the end screen does. Each returns false when there is

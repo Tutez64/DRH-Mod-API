@@ -16,6 +16,7 @@ import mods.api.dungeon.Player;
 import mods.api.State;
 import mods.api.Subscription;
 import openfl.display.DisplayObjectContainer;
+import stateMachine.mainStateMachine.LoadingScreenState;
 import stateMachine.mainStateMachine.TownState;
 import town.MapTownSubState;
 
@@ -65,7 +66,7 @@ class Hub {
 	/** Heroes on a floor now, by object id. */
 	static var heroes:Map<String, Hero> = new Map();
 
-	/** Players met in the dungeon in progress, by account. Emptied on the return to town. */
+	/** Players met in the dungeon in progress, by account. Emptied when it is left, for the town or for another dungeon. */
 	static var players:Map<String, Player> = new Map();
 
 	static var floors:Map<String, Floor> = new Map();
@@ -107,6 +108,9 @@ class Hub {
 			townEnter();
 		else if (Std.isOfType(state, MapTownSubState))
 			onMap = true;
+		// The end screen's next dungeon goes there without the town.
+		else if (Std.isOfType(state, LoadingScreenState))
+			forgetPlayers();
 	}
 
 	static function stateExit(machine:StateMachine, state:State):Void {
@@ -329,8 +333,12 @@ class Hub {
 
 	static function townEnter():Void {
 		inTown = true;
+		forgetPlayers();
+		emit(TOWN_ENTER, null);
+	}
+
+	static function forgetPlayers():Void {
 		players = new Map();
 		state.clearPlayers();
-		emit(TOWN_ENTER, null);
 	}
 }
