@@ -102,6 +102,7 @@ class Hub {
 	}
 
 	static function stateEnter(machine:StateMachine, state:State):Void {
+		Options.hideFailed();
 		if (Std.isOfType(state, TownState))
 			townEnter();
 		else if (Std.isOfType(state, MapTownSubState))

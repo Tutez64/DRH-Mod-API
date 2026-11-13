@@ -4,6 +4,8 @@ import modding.ModContext;
 import mods.api._internal.Hub;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.settings.Keys;
+import mods.api.settings.Settings;
 import openfl.display.Sprite;
 
 /**
@@ -39,8 +41,18 @@ class Context {
 
 	public var viewHeight(get, never):Float;
 
+	/** This mod's options, shown in the game's settings menu. */
+	public var settings(get, never):Settings;
+
+	/** This mod's key actions, which the player rebinds in the game's settings menu. */
+	public var keys(get, never):Keys;
+
 	/** The core this context wraps. Using it is `extends`: it is not covered by the `api` version. */
 	public var core(default, null):ModContext;
+
+	var heldSettings:Null<Settings>;
+
+	var heldKeys:Null<Keys>;
 
 	@:allow(mods.api.Mod)
 	function new(core:ModContext) {
@@ -69,6 +81,18 @@ class Context {
 
 	function get_viewHeight():Float {
 		return core.viewHeight;
+	}
+
+	function get_settings():Settings {
+		if (heldSettings == null)
+			heldSettings = new Settings(core);
+		return heldSettings;
+	}
+
+	function get_keys():Keys {
+		if (heldKeys == null)
+			heldKeys = new Keys(core);
+		return heldKeys;
 	}
 
 	public function log(message:String):Void {

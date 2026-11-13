@@ -2,7 +2,7 @@
 
 Everything the `api` mod offers, by what a mod does with it. Its version covers this text: a fix is a patch, an addition a minor, a change to what is written here a major ([Versioning](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#versioning)). Each release's notes list what it added. The steps to make a mod are in [Making a mod](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/making-a-mod.md).
 
-Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`) and `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`). `mods.api._internal` is not part of it.
+Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`) and `mods.api.settings` (`Settings`, `Flag`, `Choice`, `Slider`, `Keys`, `KeyAction`). `mods.api._internal` is not part of it.
 
 A mod written only against this page is a stable-only mod, labelled `API` in the launcher: it keeps working across DRH updates as long as the `api` major does not change. Drawing on the overlay with OpenFL is part of it. Anything else of the game is [beyond the `api`](#beyond-the-api).
 
@@ -29,7 +29,9 @@ What `init` and `ready` receive.
 | `overlay` | This mod's layer, an OpenFL `Sprite` above the game, stacked in load order. Removed if the mod fails. |
 | `viewWidth`, `viewHeight` | Size of the game's view in overlay coordinates; 0 before `ready`. |
 | `resources` | This mod's `Resources/` folder, absolute: its own files, such as `BitmapData.fromFile(resources + "/icon.png")`, the only ones its release holds besides its code. They never replace the game's. |
-| `data` | This mod's folder to write in, absolute, created on first read: its settings or anything it keeps. Kept when the mod is updated or uninstalled. |
+| `data` | This mod's folder to write in, absolute, created on first read: anything it keeps. Kept when the mod is updated or uninstalled. Its `settings.json` is the `api`'s, for [settings](#settings) and [keys](#keys). |
+| `settings` | This mod's options, shown in the game's settings menu: [Settings](#settings). |
+| `keys` | This mod's key actions, which the player rebinds: [Keys](#keys). |
 | `on…(handler)` | [Events](#events). |
 | `core` | The core this context wraps: [beyond the `api`](#beyond-the-api). |
 
@@ -44,7 +46,7 @@ Each `on…` returns a `Subscription`: `cancel()` stops it, a second call does n
 | `onFloorEnter`, `onFloorExit` | `Floor->Void` | A dungeon floor starts, its grid built (its art may still be loading), and ends. |
 | `onHeroSpawned` | `Hero->Void` | A hero, local or of another player, is on a dungeon floor and ready. Always after its floor's `onFloorEnter`. |
 | `onHeroDespawned` | `Hero->Void` | A hero leaves the floor. It still reads in the handlers, empty after them. |
-| `onKeyDown` | `UInt->Bool` | A key goes down, with its OpenFL key code: once per press, not for a held key's repeats, not while a text field such as the chat has focus. Return true to keep the key: the game never sees that press. |
+| `onKeyDown` | `UInt->Bool` | A key goes down, with its OpenFL key code: once per press, not for a held key's repeats, not while a text field such as the chat has focus. Return true to keep the key: the game never sees that press. For the keys of a mod's own window while it is open, such as Enter and Escape: a shortcut is a [key action](#keys). |
 
 Order: `init`, `onTablesLoaded`, `ready`, then everything else. A hero always comes after its floor. Town has no heroes.
 
@@ -193,6 +195,45 @@ Some of one stackable item, such as a potion or a bomb.
 | --- | --- |
 | `id`, `name` | The game's item id and its name. |
 | `count` | |
+
+## Settings
+
+`context.settings` declares a mod's options. The game's settings menu shows them, in ADVANCED, under a header with the mod's name, and the player sets them there as the game's own. Declare them in `init`: each answers its value from then on, read from the mod's `settings.json`.
+
+| Method | Declares | Returns |
+| --- | --- | --- |
+| `flag(id, label, description, defaultValue = false)` | An on/off option. | `Flag`, a `Bool` |
+| `choice(id, label, description, choices, defaultValue)` | One value among `choices`, each `{value, label}`, both text: `[{value: "en", label: "English"}, {value: "es", label: "Spanish"}]`. The menu shows the labels, in capitals, and they differ. | `Choice`, a `String`: the chosen `value` |
+| `slider(id, label, description, minimum, maximum, step, defaultValue, decimals = 0)` | A number in a range, shown with `decimals` digits after the point. | `Slider`, a `Float` |
+
+`id` names the option in the mod's file: unique among the mod's options, and the same across its versions. Another mod may use the same. `label` is the row's title, shown in capitals on one line: about 15 characters fit a slider, 19 the others, and a longer one is made smaller, then cut. `description` shows under a flag's label only: the game's rows for a choice, a slider and a key have no room for one. A declaration that cannot be shown throws: an id declared twice, no choices, a default that is not one of them, an empty range.
+
+Each of the three has:
+
+| Member | What |
+| --- | --- |
+| `value` | Its value now. Setting it shows in the menu and is kept, as when the player sets it: a `Choice` refuses a value that is not one of its choices, a `Slider` brings one within its range. |
+| `onChange(handler)` | The value changed, with the new one: set by the player in the menu, by the menu's reset, or by the mod. In town or during a run. Returns a `Subscription`. |
+
+The menu's reset puts every option back to its declared default. An option the mod no longer declares stays in the file, ignored.
+
+The file is the `api`'s: it writes it whole at the first change, and nothing else stays in it. A mod that kept a `settings.json` of its own before reads it in `init`, then gives each option the value it had (`flag.value = …`), so the player's choices carry over; whatever else it kept there goes to another file.
+
+## Keys
+
+`context.keys` declares a mod's key actions. The game's settings menu shows them at the end of CONTROLS, under a header with the mod's name, and the player rebinds them there. Declare them in `init`.
+
+`action(id, label, description, key, shift = false, ctrl = false, alt = false)` returns a `KeyAction`. `key` is the OpenFL key code the action has until the player changes it; Escape, Enter, F8 and F11 cannot be bound, and declaring one throws. `shift`, `ctrl` and `alt` are the modifiers a press needs held, which the row's title names (`RESTART (SHIFT+)`). The player cannot change them yet and will later: the action must make sense without them.
+
+| Member | What |
+| --- | --- |
+| `onPress(handler)` | The action is pressed: once per press, not for a held key's repeats, not while a text field such as the chat has focus, nor while the settings menu is open. The game never sees that press. `Void->Void`; returns a `Subscription`. |
+| `held` | Whether its key is down now, with its modifiers. |
+| `label` | What is bound, as the menu names keys, to show the player: `"SHIFT+R"`, empty when nothing is. |
+
+A mod never reads the key code: the player may have changed it, or given the action a second key.
+
+A key is one action's, the game's own included. Binding a key in the menu takes it from the action that had it. An action whose key is already held when its mod loads, by the game or by a mod loaded before, starts with none, and has it at a later start once it is free: do not declare a key the game uses. The menu compares the key alone: R and Shift+R are the same key.
 
 ## Drawing
 
