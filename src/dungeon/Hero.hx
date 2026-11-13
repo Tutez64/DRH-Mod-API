@@ -25,6 +25,9 @@ class Hero {
 
 	public var level(get, never):UInt;
 
+	/** How many times the hero ascended: the number in its star. 0 for a hero that never did, and once the hero is gone. */
+	public var ascension(get, never):UInt;
+
 	/** World position; 0 once the hero is gone. */
 	public var x(get, never):Float;
 
@@ -75,6 +78,11 @@ class Hero {
 	function get_level():UInt {
 		var live = live();
 		return live == null ? 0 : live.level;
+	}
+
+	function get_ascension():UInt {
+		var live = live();
+		return live == null ? 0 : live.ascensionLevel;
 	}
 
 	function get_x():Float {

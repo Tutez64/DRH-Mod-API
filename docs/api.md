@@ -109,6 +109,7 @@ Fields read the live hero and go empty after the `onHeroDespawned` handlers.
 | `player` | Its [Player](#player); null only if the game sent no account for it. |
 | `classId`, `className` | The hero class: the game's id and the name it shows. |
 | `level` | |
+| `ascension` | How many times the hero ascended: the number in its star. 0 for a hero that never did. |
 | `x`, `y` | World position; 0 once gone. |
 | `weapons` | Equipped [weapons](#weapon) by slot, empty slots left out. A copy. |
 
@@ -122,6 +123,7 @@ Fields read the live hero and go empty after the `onHeroDespawned` handlers.
 | `hero` | Its hero on the current floor; null between floors and once the player has left. |
 | `isFriend` | Whether the local account has this player as a friend. |
 | `createPortrait(size)` | The player's picture, as on the end screen: the icon of their hero's skin, centred in a `size` square. |
+| `createAscensionStar(size)` | The ascension star of their hero with its number, as the game shows it by a portrait, centred in a `size` square. Empty for a hero that never ascended. |
 | `addFriend(?sent)` | Sends a friend request, as the end screen does. |
 | `block(?sent)` | Asks for confirmation with the game's popup, then blocks the player. |
 | `report(?sent)` | Opens the game's report popup. |
@@ -160,7 +162,7 @@ A hero of the account, copied when read, with what it carries into a dungeon; no
 | Member | What |
 | --- | --- |
 | `id` | As `Account.activeAvatarId`. |
-| `classId`, `className`, `level` | As on `Hero`. |
+| `classId`, `className`, `level`, `ascension` | As on `Hero`. |
 | `skinId` | The game's skin id. |
 | `weapons`, `pets`, `consumables` | Equipped, by slot, empty slots left out. |
 | `equipPet(pet, ?done)` | Equips the pet on this hero, in town, as the inventory does but without its popup: the pet this hero carries goes back to storage, and `pet` leaves the hero carrying it. `done` runs once: true once the server accepted, false on an error, which the game shows. |
@@ -240,7 +242,7 @@ A key is one action's, the game's own included. Binding a key in the menu takes 
 
 ## Drawing
 
-Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and `viewHeight`, which change with the window. `createPortrait` and `createIcon` return OpenFL `Sprite`s for the overlay: their art appears once loaded. They need no cleanup: drop them like any sprite.
+Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and `viewHeight`, which change with the window. `createPortrait`, `createAscensionStar` and `createIcon` return OpenFL `Sprite`s for the overlay: their art appears once loaded. They need no cleanup: drop them like any sprite.
 
 ## Beyond the `api`
 

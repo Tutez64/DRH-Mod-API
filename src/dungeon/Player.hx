@@ -36,7 +36,7 @@ class Player {
 	/** Whether the local account has this player as a friend. */
 	public var isFriend(get, never):Bool;
 
-	/** Last values read from the player's hero, for the portrait and the report. */
+	/** Last values read from the player's hero, for the portrait, the star and the report. */
 	var knownName:String = "";
 
 	var knownClass:UInt = 0;
@@ -44,6 +44,8 @@ class Player {
 	var knownExperience:UInt = 0;
 
 	var knownSkin:UInt = 0;
+
+	var knownAscension:UInt = 0;
 
 	@:allow(mods.api._internal.Hub)
 	function new(accountId:UInt, local:Bool) {
@@ -70,6 +72,7 @@ class Player {
 		knownClass = live.type;
 		knownExperience = live.experiencePoints;
 		knownSkin = live.skinType;
+		knownAscension = live.ascensionLevel;
 	}
 
 	function get_name():String {
@@ -89,6 +92,15 @@ class Player {
 	public function createPortrait(size:Float):Sprite {
 		remember();
 		return Art.skinPortrait(knownSkin, size);
+	}
+
+	/**
+	 * The ascension star of the player's hero with its number, as the game shows it by a portrait,
+	 * centred in a `size` square. Empty for a hero that never ascended. Dropped like the portrait.
+	 */
+	public function createAscensionStar(size:Float):Sprite {
+		remember();
+		return Art.ascensionStar(knownAscension, size);
 	}
 
 	/** Sends a friend request, as the end screen does. */

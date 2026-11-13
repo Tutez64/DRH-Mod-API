@@ -3,6 +3,7 @@ package mods.api._internal;
 import brain.assetRepository.AssetLoadingComponent;
 import brain.assetRepository.SwfAsset;
 import brain.uI.UIObject;
+import brain.utils.TextUtil;
 import facade.DBFacade;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
@@ -10,6 +11,9 @@ import flash.events.Event;
 import flash.geom.Point;
 import gameMasterDictionary.GMRarity;
 import gameMasterDictionary.GMWeaponItem;
+// By their own names: a type test through the flash alias answers false in a compiled mod.
+import openfl.display.DisplayObjectContainer;
+import openfl.text.TextField;
 import uI.inventory.UIWeaponTooltip;
 
 /**
@@ -22,6 +26,13 @@ import uI.inventory.UIWeaponTooltip;
 class Art {
 	/** Holds the weapon tooltip template, as on the end screen. */
 	static inline final TOWN_SWF = "Resources/Art2D/UI/db_UI_town.swf";
+
+	/** A friend's slot, in the town's swf: the ascension star is no symbol of its own, and this one holds it. */
+	static inline final STAR_HOLDER = "friend_slot";
+
+	static inline final STAR = "friend_ascension";
+
+	static inline final STAR_NUMBER = "level";
 
 	/** Scales the end screen gives a weapon's icon and its rarity background. */
 	static inline final ICON_SCALE:Float = 0.5;
@@ -120,6 +131,48 @@ class Art {
 			return root;
 		var loader = new AssetLoadingComponent(facade);
 		place(loader, skin.UISwfFilepath, skin.IconName, root, size);
+		releaseOnRemove(root, function() loader.destroy());
+		return root;
+	}
+
+	/** The game's ascension star with its number, in a `size` square. Empty for a hero that never ascended. */
+	static function ascensionStar(ascension:UInt, size:Float):Sprite {
+		var root = new Sprite();
+		root.mouseEnabled = false;
+		root.mouseChildren = false;
+		var facade = Hub.facade();
+		if (facade == null || ascension == 0)
+			return root;
+		var loader = new AssetLoadingComponent(facade);
+		load(loader, TOWN_SWF, STAR_HOLDER, function(slot:DisplayObject) {
+			var holder = Std.downcast(slot, DisplayObjectContainer);
+			var star = holder == null ? null : Std.downcast(holder.getChildByName(STAR), DisplayObjectContainer);
+			if (star == null)
+				return;
+			var number = Std.downcast(star.getChildByName(STAR_NUMBER), TextField);
+			if (number != null)
+				TextUtil.setText(number, Std.string(ascension));
+			// Fitted on the star's own shape: the number's field is wider than what it shows.
+			var shape:DisplayObject = star;
+			for (index in 0...star.numChildren) {
+				var child = star.getChildAt(index);
+				if (child != number) {
+					shape = child;
+					break;
+				}
+			}
+			star.x = 0;
+			star.y = 0;
+			star.scaleX = 1;
+			star.scaleY = 1;
+			root.addChild(star);
+			var bounds = shape.getBounds(root);
+			var scale = size / Math.max(bounds.width, bounds.height);
+			star.scaleX = scale;
+			star.scaleY = scale;
+			star.x = size / 2 - (bounds.x + bounds.width / 2) * scale;
+			star.y = size / 2 - (bounds.y + bounds.height / 2) * scale;
+		});
 		releaseOnRemove(root, function() loader.destroy());
 		return root;
 	}
