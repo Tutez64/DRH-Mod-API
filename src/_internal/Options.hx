@@ -15,14 +15,23 @@ import settings.model.SettingsModel;
  * through `Context.settings` and `Context.keys`.
  *
  * Each entry becomes a definition of the game's settings catalog, with the game's own row: key actions
- * at the end of CONTROLS, options in ADVANCED, a mod's together under a header (`OptionsMenu`). The game then does the
+ * at the end of CONTROLS, options in a tab, a mod's together under a header. The game then does the
  * rest: its menu, its reset, and its rule that a key is one action's, the game's own included. A value
  * is the mod's all along, kept in its data folder; the game reads and writes it through the entry's
  * binding.
+ *
+ * A game that opens its settings to mods (`modding.ModSettings`, from DRH 18) takes the definitions
+ * itself: it gives the options a MODS tab, draws the headers, makes a button's row and keeps the values
+ * out of its own file. Before it, they are put in the catalog from here, the options in ADVANCED, and
+ * `OptionsMenu` draws the headers.
  */
 @:allow(mods.api)
 class Options {
+	/** Where the options go in a game that has no tab for the mods. */
 	static inline final OPTIONS_CATEGORY = "advanced";
+
+	/** The game's own way in, null before DRH 18. Reached by name: a mod naming it would not load without it. */
+	static var host:Dynamic = findHost();
 
 	static inline final KEYS_CATEGORY = "controls";
 
@@ -47,6 +56,26 @@ class Options {
 
 	/** The keys held now, by key code. */
 	static var held:Map<Int, Bool> = new Map();
+
+	static function findHost():Dynamic {
+		var type:Dynamic = Type.resolveClass("modding.ModSettings");
+		return type != null && Reflect.field(type, "add") != null && Reflect.field(type, "button") != null ? type : null;
+	}
+
+	static function hostCall(name:String, arguments:Array<Dynamic>):Dynamic {
+		return Reflect.callMethod(host, Reflect.field(host, name), arguments);
+	}
+
+	/** The tab the game gives the mods' options. */
+	static function hostCategory():String {
+		var category:Dynamic = Reflect.field(host, "CATEGORY");
+		return Std.isOfType(category, String) ? category : "mods";
+	}
+
+	/** Whether the game shows a button's row. */
+	static function buttons():Bool {
+		return host != null;
+	}
 
 	static function of(core:ModContext):ModOptions {
 		for (mod in mods)
@@ -85,7 +114,8 @@ class Options {
 		facade.stageRef.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown, false, 1001);
 		facade.stageRef.addEventListener(KeyboardEvent.KEY_UP, stageKeyUp, false, 1001);
 		facade.stageRef.addEventListener(Event.DEACTIVATE, deactivated);
-		OptionsMenu.start();
+		if (host == null)
+			OptionsMenu.start();
 	}
 
 	static function stageKeyDown(event:KeyboardEvent):Void {
@@ -113,8 +143,20 @@ class Options {
 	static function show(entry:Entry):Void {
 		if (model == null || entry.definition != null || !entry.owner.core.alive)
 			return;
+		if (entry.kind == Entry.BUTTON) {
+			if (host != null)
+				entry.definition = hostCall("button", [
+					entry.gameId(),
+					entry.owner.name,
+					entry.label.toUpperCase(),
+					entry.caption.toUpperCase(),
+					function() pressed(entry)
+				]);
+			return;
+		}
 		var isKey = entry.kind == Entry.KEY;
-		var builder = new SettingBuilder(entry.gameId(), isKey ? KEYS_CATEGORY : OPTIONS_CATEGORY).literalText(title(entry, OptionsMenu.failed), entry.description)
+		var category:String = isKey ? KEYS_CATEGORY : (host != null ? hostCategory() : OPTIONS_CATEGORY);
+		var builder = new SettingBuilder(entry.gameId(), category).literalText(title(entry, host == null && OptionsMenu.failed), entry.description)
 			.boundTo(new EntryBinding(entry));
 		if (isKey) {
 			unbindTaken(entry);
@@ -136,6 +178,11 @@ class Options {
 			for (i in 0...definition.choices.length)
 				definition.choices[i].labelKey = null;
 
+		if (host != null) {
+			hostCall("add", [definition, entry.owner.name]);
+			entry.definition = definition;
+			return;
+		}
 		var catalog = model.catalog;
 		var definitions:Vector<SettingDefinition> = @:privateAccess catalog.mDefinitions;
 		var prefix = "mods." + entry.owner.id + ".";
@@ -198,6 +245,10 @@ class Options {
 		if (definition == null || model == null)
 			return;
 		entry.definition = null;
+		if (host != null) {
+			hostCall("remove", [definition]);
+			return;
+		}
 		var catalog = model.catalog;
 		var definitions:Vector<SettingDefinition> = @:privateAccess catalog.mDefinitions;
 		var at = definitions.indexOf(definition);
@@ -228,13 +279,12 @@ class Options {
 
 	/** The id of a key action other than `except` that holds the key, in the game's settings. */
 	static function holder(key:Int, except:Null<SettingDefinition>):Null<String> {
-		var definitions:Vector<SettingDefinition> = @:privateAccess model.catalog.mDefinitions;
-		var values:Dynamic = @:privateAccess model.mValues;
+		var definitions:Vector<SettingDefinition> = model.catalog.definitions;
 		for (i in 0...definitions.length) {
 			var definition = definitions[i];
 			if (definition == except || !definition.isKeyBinding)
 				continue;
-			var value:Dynamic = Reflect.field(values, definition.id);
+			var value:Dynamic = model.getValue(definition.id);
 			if (value != null && (KeyBindingValue.primary(value) == key || KeyBindingValue.alternate(value) == key))
 				return definition.id;
 		}
@@ -315,6 +365,12 @@ class Options {
 		entry.value = value;
 		entry.owner.save();
 		Hub.emit(entry.event, value);
+	}
+
+	/** A button of the menu was pressed. */
+	static function pressed(entry:Entry):Void {
+		if (entry.owner.core.alive)
+			Hub.emit(entry.event, null);
 	}
 
 	/** A key went down: the actions bound to it are pressed, unless the settings menu is taking it. */

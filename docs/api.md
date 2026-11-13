@@ -2,7 +2,7 @@
 
 Everything the `api` mod offers, by what a mod does with it. Its version covers this text: a fix is a patch, an addition a minor, a change to what is written here a major ([Versioning](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#versioning)). Each release's notes list what it added. The steps to make a mod are in [Making a mod](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/making-a-mod.md).
 
-Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`) and `mods.api.settings` (`Settings`, `Flag`, `Choice`, `Slider`, `Keys`, `KeyAction`). `mods.api._internal` is not part of it.
+Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`) and `mods.api.settings` (`Settings`, `Flag`, `Choice`, `Slider`, `Button`, `Keys`, `KeyAction`). `mods.api._internal` is not part of it.
 
 A mod written only against this page is a stable-only mod, labelled `API` in the launcher: it keeps working across DRH updates as long as the `api` major does not change. Drawing on the overlay with OpenFL is part of it. Anything else of the game is [beyond the `api`](#beyond-the-api).
 
@@ -198,22 +198,25 @@ Some of one stackable item, such as a potion or a bomb.
 
 ## Settings
 
-`context.settings` declares a mod's options. The game's settings menu shows them, in ADVANCED, under a header with the mod's name, and the player sets them there as the game's own. Declare them in `init`: each answers its value from then on, read from the mod's `settings.json`.
+`context.settings` declares a mod's options. The game's settings menu shows them in its MODS tab (ADVANCED before DRH 18, which has no such tab), under a header with the mod's name, and the player sets them there as the game's own. Declare them in `init`: each answers its value from then on, read from the mod's `settings.json`.
 
 | Method | Declares | Returns |
 | --- | --- | --- |
 | `flag(id, label, description, defaultValue = false)` | An on/off option. | `Flag`, a `Bool` |
 | `choice(id, label, description, choices, defaultValue)` | One value among `choices`, each `{value, label}`, both text: `[{value: "en", label: "English"}, {value: "es", label: "Spanish"}]`. The menu shows the labels, in capitals, and they differ. | `Choice`, a `String`: the chosen `value` |
 | `slider(id, label, description, minimum, maximum, step, defaultValue, decimals = 0)` | A number in a range, shown with `decimals` digits after the point. | `Slider`, a `Float` |
+| `button(id, label, caption)` | A row that is a button, with `caption` written on it, such as one that opens the mod's own window. It holds no value. | `Button` |
 
 `id` names the option in the mod's file: unique among the mod's options, and the same across its versions. Another mod may use the same. `label` is the row's title, shown in capitals on one line: about 15 characters fit a slider, 19 the others, and a longer one is made smaller, then cut. `description` shows under a flag's label only: the game's rows for a choice, a slider and a key have no room for one. A declaration that cannot be shown throws: an id declared twice, no choices, a default that is not one of them, an empty range.
 
-Each of the three has:
+A flag, a choice and a slider each have:
 
 | Member | What |
 | --- | --- |
 | `value` | Its value now. Setting it shows in the menu and is kept, as when the player sets it: a `Choice` refuses a value that is not one of its choices, a `Slider` brings one within its range. |
 | `onChange(handler)` | The value changed, with the new one: set by the player in the menu, by the menu's reset, or by the mod. In town or during a run. Returns a `Subscription`. |
+
+A `Button` has `onPress(handler)`, called when it is pressed, the menu staying open, and `shown`: whether the game shows it, which DRH 18 and later do. Without it, give the player another way, such as a [key action](#keys).
 
 The menu's reset puts every option back to its declared default. An option the mod no longer declares stays in the file, ignored.
 

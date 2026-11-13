@@ -12,6 +12,9 @@ class Entry {
 
 	public static inline final KEY = 3;
 
+	/** A row that is a button: it holds no value, and only a game that makes such a row shows it. */
+	public static inline final BUTTON = 4;
+
 	public var owner:ModOptions;
 
 	public var kind:Int;
@@ -53,6 +56,9 @@ class Entry {
 	 * has the key again once nobody else does.
 	 */
 	public var yielded:Int = 0;
+
+	/** What a button's row writes on it. */
+	public var caption:String = "";
 
 	/** The modifiers the action declared, which a press needs held. */
 	public var shift:Bool = false;

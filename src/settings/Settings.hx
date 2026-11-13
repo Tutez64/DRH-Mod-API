@@ -63,6 +63,17 @@ class Settings {
 		return new Choice(entry);
 	}
 
+	/**
+	 * A row that is a button, such as one that opens the mod's own window: `label` names the row,
+	 * `caption` is written on the button. It holds no value. Only DRH 18 and later show it (`shown`).
+	 */
+	public function button(id:String, label:String, caption:String):Button {
+		var entry = owner.add(Entry.BUTTON, id, label, "");
+		entry.caption = caption == null ? "" : caption;
+		Options.declared(entry);
+		return new Button(entry);
+	}
+
 	/** A number from `minimum` to `maximum` by `step`, shown with `decimals` digits after the point. */
 	public function slider(id:String, label:String, description:String, minimum:Float, maximum:Float, step:Float, defaultValue:Float,
 			decimals:Int = 0):Slider {

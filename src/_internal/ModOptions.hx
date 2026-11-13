@@ -98,6 +98,8 @@ class ModOptions {
 	public function save():Void {
 		load();
 		for (entry in entries) {
+			if (entry.kind == Entry.BUTTON)
+				continue;
 			if (entry.kind == Entry.KEY)
 				Reflect.setField(keys, entry.id, {
 					key: entry.key != 0 ? entry.key : entry.yielded,
