@@ -2,7 +2,7 @@
 
 Everything the `api` mod offers, by what a mod does with it. Its version covers this text: a fix is a patch, an addition a minor, a change to what is written here a major ([Versioning](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#versioning)). Each release's notes list what it added. The steps to make a mod are in [Making a mod](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/making-a-mod.md).
 
-Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`) and `mods.api.settings` (`Settings`, `Flag`, `Choice`, `Slider`, `Button`, `Keys`, `KeyAction`). `mods.api._internal` is not part of it.
+Its types sit by what they read: `mods.api` (`Mod`, `Context`, `State`, `Subscription`, `Dictionaries`), `mods.api.dungeon` (`Floor`, `Tile`, `Monster`, `Hero`, `Player`), `mods.api.account` (`Account`, `Inventory`, `OwnedHero`, `Weapon`, `Pet`, `Stack`) and `mods.api.settings` (`Settings`, `Flag`, `Choice`, `Slider`, `Button`, `Keys`, `KeyAction`). `mods.api._internal` is not part of it.
 
 A mod written only against this page is a stable-only mod, labelled `API` in the launcher: it keeps working across DRH updates as long as the `api` major does not change. Drawing on the overlay with OpenFL is part of it. Anything else of the game is [beyond the `api`](#beyond-the-api).
 
@@ -247,5 +247,19 @@ Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and
 ## Beyond the `api`
 
 `context.core` is the game's core (`modding.ModContext`), and through it the game's own classes: its generic events (any game object ready or gone, fields the server sends, state changes), `facade` (from `ready`), and from there the game's event bus (`facade.eventManager`). Using any of it makes the mod `extends`: `uses: ["extends"]` and `drh` in `mod.json`, a warning in the launcher, and no promise across DRH updates. [DRH-Mod-Inspector](https://github.com/Tutez64/DRH-Mod-Inspector) is an example, and a tool to see what is there. The core's events and rules: [Game events](https://github.com/Tutez64/Dungeon-Rampage-Haxe/blob/master/docs/modding.md#game-events).
+
+### Dictionaries
+
+A dictionary of the game (`ASDictionary` in its classes) keeps the entries whose key is a text, a number or a boolean apart from the others. A mod's own `get`, `set`, `exists`, `remove`, `keys` and loops on it do not reach them, and `dictionary[key]` with such a key throws: what the game wrote the mod does not see, and what a mod writes the game does not find. `mods.api.Dictionaries` reaches every entry, whatever its key:
+
+| Function | What |
+| --- | --- |
+| `get(dictionary, key)` | The value under the key, null when there is none. |
+| `set(dictionary, key, value)` | Puts the value under the key. |
+| `exists(dictionary, key)` | Whether there is an entry under the key. |
+| `remove(dictionary, key)` | Removes the entry; whether there was one. |
+| `keys(dictionary)`, `values(dictionary)` | Every key, every value. A copy. |
+
+Anything that is not a dictionary is refused with a throw.
 
 What a mod needs from there and others would too is a candidate for a later `api`: say so on Discord or in this repository's issues.

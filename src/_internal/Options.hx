@@ -2,6 +2,7 @@ package mods.api._internal;
 
 import input.keyBindings.KeyNames;
 import modding.ModContext;
+import mods.api.Dictionaries;
 import openfl.Vector;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
@@ -194,7 +195,7 @@ class Options {
 			definitions.push(definition);
 		else
 			definitions.insertAt(after + 1, definition);
-		dictionary("setIn", [@:privateAccess catalog.mDefinitionsById, definition.id, definition]);
+		Dictionaries.set(@:privateAccess catalog.mDefinitionsById, definition.id, definition);
 		entry.definition = definition;
 		var value:Dynamic = modelValue(entry);
 		Reflect.setField(@:privateAccess model.mValues, definition.id, value);
@@ -254,16 +255,7 @@ class Options {
 		var at = definitions.indexOf(definition);
 		if (at >= 0)
 			definitions.splice(at, 1);
-		dictionary("removeIn", [@:privateAccess catalog.mDefinitionsById, definition.id]);
-	}
-
-	/**
-	 * The catalog's dictionary keeps a text key apart from the others, through functions of its own that
-	 * a mod can only reach by name.
-	 */
-	static function dictionary(name:String, arguments:Array<Dynamic>):Dynamic {
-		var type:Dynamic = Type.resolveClass("_ASDictionary.ASDictionary_Impl_");
-		return Reflect.callMethod(type, Reflect.field(type, name), arguments);
+		Dictionaries.remove(@:privateAccess catalog.mDefinitionsById, definition.id);
 	}
 
 	/** A key another action holds, the game's or a mod's shown before, is not this entry's as well. */
