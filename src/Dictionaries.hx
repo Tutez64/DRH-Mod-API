@@ -4,9 +4,9 @@ package mods.api;
  * A dictionary of the game, read and written as the game does.
  *
  * The game keeps the entries whose key is a text, a number or a boolean apart from the others. A mod's
- * own `get`, `set`, `exists`, `remove`, `keys` and loops on it do not reach them, and `dictionary[key]`
- * with such a key throws: what the game wrote the mod does not see, and what a mod writes the game does
- * not find. These reach every entry, whatever its key.
+ * own `dictionary[key]`, `get`, `set`, `exists`, `remove`, `keys` and loops on it do not reach them:
+ * what the game wrote the mod does not see, and what a mod writes the game does not find. These reach
+ * every entry, whatever its key.
  */
 class Dictionaries {
 	/** The game's own functions, reached by name: its dictionary type has no form a mod can name. */

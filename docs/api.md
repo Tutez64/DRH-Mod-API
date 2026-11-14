@@ -250,7 +250,7 @@ Add OpenFL display objects to `context.overlay`; place them with `viewWidth` and
 
 ### Dictionaries
 
-A dictionary of the game (`ASDictionary` in its classes) keeps the entries whose key is a text, a number or a boolean apart from the others. A mod's own `get`, `set`, `exists`, `remove`, `keys` and loops on it do not reach them, and `dictionary[key]` with such a key throws: what the game wrote the mod does not see, and what a mod writes the game does not find. `mods.api.Dictionaries` reaches every entry, whatever its key:
+A dictionary of the game (`ASDictionary` in its classes) keeps the entries whose key is a text, a number or a boolean apart from the others. A mod's own `dictionary[key]`, `get`, `set`, `exists`, `remove`, `keys` and loops on it do not reach them: what the game wrote the mod does not see, and what a mod writes the game does not find. `mods.api.Dictionaries` reaches every entry, whatever its key:
 
 | Function | What |
 | --- | --- |
