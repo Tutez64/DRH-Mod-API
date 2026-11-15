@@ -60,6 +60,9 @@ class Hub {
 
 	static var state:State = new State();
 
+	/** Every mod's core context under its id, the `api`'s own included, from the moment it starts. */
+	static var started:Map<String, ModContext> = new Map();
+
 	static var listeners:Map<String, Array<Subscription>> = new Map();
 
 	static var keysHooked:Bool = false;
@@ -96,8 +99,20 @@ class Hub {
 	/** Listens to the fields the server sends while a floor waits for its tiles. */
 	static var tilesWatch:Null<ModSubscription>;
 
+	/** A mod starts: it can be asked about from now on. */
+	static function know(ctx:ModContext):Void {
+		started.set(@:privateAccess ctx.id, ctx);
+	}
+
+	/** Whether the mod of that id started and has not failed since. */
+	static function active(id:String):Bool {
+		var ctx = id == null ? null : started.get(id);
+		return ctx != null && ctx.alive;
+	}
+
 	static function start(ctx:ModContext):Void {
 		core = ctx;
+		know(ctx);
 		ctx.onObjectReady(objectReady);
 		ctx.onObjectGone(objectGone);
 		ctx.onStateEnter(stateEnter);

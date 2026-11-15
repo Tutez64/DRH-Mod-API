@@ -25,6 +25,7 @@ What `init` and `ready` receive.
 | Member | What |
 | --- | --- |
 | `log(message)` | Writes `mod <id>: <message>` to the game's log, and to the output of `--run-mod`. |
+| `isActive(id)` | Whether the mod of that id runs: enabled, started, and not failed since. Ask from `ready` on: in `init`, a mod that starts after this one is not there yet. |
 | `state` | The live game, shared by every mod: [State](#state). |
 | `overlay` | This mod's layer, an OpenFL `Sprite` above the game, stacked in load order. Removed if the mod fails. |
 | `viewWidth`, `viewHeight` | Size of the game's view in overlay coordinates; 0 before `ready`. |

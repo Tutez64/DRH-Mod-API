@@ -100,6 +100,14 @@ class Context {
 		core.log(message);
 	}
 
+	/**
+	 * Whether the mod of that id runs: enabled, started, and not failed since. Ask from `ready` on: in
+	 * `init`, a mod that starts after this one is not there yet.
+	 */
+	public function isActive(id:String):Bool {
+		return Hub.active(id);
+	}
+
 	/** A hero, local or remote, is on a dungeon floor and initialised. Not town. Always after that floor's `onFloorEnter`. */
 	public function onHeroSpawned(handler:Hero->Void):Subscription {
 		return Hub.listen(core, Hub.HERO_SPAWNED, handler);

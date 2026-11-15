@@ -7,6 +7,7 @@ At tag time, copy these sections into the GitHub release notes.
   - Each hands a `Monster` copied at that moment: tell one from another by its `id`.
   - A monster is told as spawned after its floor's `onFloorEnter`, and as despawned once, when it dies, leaves or its floor ends, before that floor's `onFloorExit`.
 - `Monster.hp` and `Monster.maxHp`: its hit points, and what they are when it is whole, with what its buffs add.
+- `context.isActive(id)`: whether another mod runs, that is enabled, started and not failed since, so a mod that changes what it does beside another no longer has to look for that mod's classes. Ask from `ready` on.
 
 ## Improved
 

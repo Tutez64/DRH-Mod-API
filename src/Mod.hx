@@ -1,6 +1,7 @@
 package mods.api;
 
 import modding.ModContext;
+import mods.api._internal.Hub;
 
 /**
  * Base class of every mod's entry (`mod.json` `entry`). All three methods are optional.
@@ -19,6 +20,7 @@ class Mod extends modding.Mod {
 
 	override public function onInit(ctx:ModContext):Void {
 		apiContext = new Context(ctx);
+		Hub.know(ctx);
 		init(apiContext);
 	}
 
