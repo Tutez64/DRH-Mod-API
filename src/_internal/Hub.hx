@@ -6,6 +6,7 @@ import brain.stateMachine.StateMachine;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
+import distributedObjects.NPCGameObject;
 import facade.DBFacade;
 import modding.ModContext;
 import modding.ModSubscription;
@@ -71,6 +72,9 @@ class Hub {
 
 	static var floors:Map<String, Floor> = new Map();
 
+	/** The NPCs ready on each floor now, by the floor's object id: what `Floor.monsters` picks from. */
+	static var foes:Map<String, Array<Foe>> = new Map();
+
 	/** Floors ready without their tiles yet, which the server sends after them from the second floor on. */
 	static var tileless:Array<DistributedDungeonFloor> = [];
 
@@ -90,6 +94,8 @@ class Hub {
 	static function objectReady(object:GameObject):Void {
 		if (Std.isOfType(object, HeroGameObject))
 			heroSpawned(cast object);
+		else if (Std.isOfType(object, NPCGameObject))
+			foeReady(cast object);
 		else if (Std.isOfType(object, DistributedDungeonFloor))
 			floorReady(cast object);
 	}
@@ -98,6 +104,8 @@ class Hub {
 	static function objectGone(object:GameObject):Void {
 		if (Std.isOfType(object, HeroGameObject))
 			heroDespawned(cast object);
+		else if (Std.isOfType(object, NPCGameObject))
+			foeGone(cast object);
 		else if (Std.isOfType(object, DistributedDungeonFloor))
 			floorExit(cast object);
 	}
@@ -276,6 +284,33 @@ class Hub {
 		hero.detach();
 	}
 
+	/** An NPC is ready on its floor, which may not have entered yet. */
+	static function foeReady(object:NPCGameObject):Void {
+		var floor = object.distributedDungeonFloor;
+		if (floor == null)
+			return;
+		var key = Std.string(floor.id);
+		var list:Null<Array<Foe>> = foes.get(key);
+		if (list == null) {
+			list = [];
+			foes.set(key, list);
+		}
+		list.push(new Foe(object));
+	}
+
+	static function foeGone(object:NPCGameObject):Void {
+		for (list in foes) {
+			var known:Array<Foe> = list;
+			for (i in 0...known.length) {
+				var foe:Foe = known[i];
+				if (foe.npc == object) {
+					known.splice(i, 1);
+					return;
+				}
+			}
+		}
+	}
+
 	/** A floor enters once it has its tiles. */
 	static function floorReady(object:DistributedDungeonFloor):Void {
 		if (hasTiles(object)) {
@@ -318,6 +353,7 @@ class Hub {
 	static function floorExit(object:DistributedDungeonFloor):Void {
 		settle(object);
 		var key = Std.string(object.id);
+		foes.remove(key);
 		var floor = floors.get(key);
 		if (floor == null)
 			return;

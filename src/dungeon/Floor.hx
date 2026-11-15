@@ -3,6 +3,8 @@ package mods.api.dungeon;
 import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.NPCGameObject;
+import mods.api._internal.Foe;
+import mods.api._internal.Hub;
 
 /** The dungeon floor in progress. Not town. */
 class Floor {
@@ -31,6 +33,9 @@ class Floor {
 
 	var floor:DistributedDungeonFloor;
 
+	/** The tiles once read whole, which a floor keeps as they are: each read copies them. */
+	var laid:Null<Array<Tile>>;
+
 	@:allow(mods.api._internal.Hub)
 	function new(floor:DistributedDungeonFloor) {
 		this.floor = floor;
@@ -57,13 +62,29 @@ class Floor {
 		if (floor == null || floor.isDestroyed)
 			return out;
 		var usages = @:privateAccess floor.mTileNetworkComponents;
-		var factory = floor.dungeonFloorFactory == null ? null : floor.dungeonFloorFactory.tileFactory;
-		var library = factory == null ? null : @:privateAccess factory.mTileMap;
 		if (usages == null)
 			return out;
-		for (i in 0...usages.length) {
+		var count:Int = usages.length;
+		if (laid == null || laid.length != count)
+			laid = count == 0 ? null : readTiles(usages, count, true);
+		var known:Array<Tile> = laid == null ? readTiles(usages, count, false) : laid;
+		for (i in 0...known.length) {
+			var tile:Tile = known[i];
+			out.push(new Tile(tile.x, tile.y, tile.id, tile.category, tile.exits.copy()));
+		}
+		return out;
+	}
+
+	/** The floor's tiles read from the game; with `whole`, null while the library cannot say what one of them is. */
+	function readTiles(usages:Dynamic, count:Int, whole:Bool):Null<Array<Tile>> {
+		var out:Array<Tile> = [];
+		var factory = floor.dungeonFloorFactory == null ? null : floor.dungeonFloorFactory.tileFactory;
+		var library = factory == null ? null : @:privateAccess factory.mTileMap;
+		for (i in 0...count) {
 			var usage = usages[i];
 			var json:Dynamic = library == null ? null : library.itemFor(usage.tileId);
+			if (json == null && whole)
+				return null;
 			var category:Null<String> = json == null ? null : json.category;
 			var sides:Dynamic = json == null ? null : json.exits;
 			var exits = [for (side in 0...4) sides != null && side < sides.length && sides[side] != null && sides[side] != 0];
@@ -74,14 +95,16 @@ class Floor {
 
 	function get_monsters():Array<Monster> {
 		var out:Array<Monster> = [];
-		if (floor == null || floor.isDestroyed || floor.remoteActors == null)
+		if (floor == null || floor.isDestroyed)
+			return out;
+		var known:Null<Array<Foe>> = Hub.foes.get(Std.string(id));
+		if (known == null)
 			return out;
 		var avatar = floor.activeOwnerAvatar;
 		var heroes:Int = avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team;
-		for (actor in floor.remoteActors.toArray()) {
-			if (!Std.isOfType(actor, NPCGameObject))
-				continue;
-			var npc:NPCGameObject = cast actor;
+		for (i in 0...known.length) {
+			var foe:Foe = known[i];
+			var npc:NPCGameObject = foe.npc;
 			if (npc.isDestroyed || npc.isDead())
 				continue;
 			// Teams besides the heroes': props (environment), and traps that hurt everyone (the third team).
@@ -89,9 +112,7 @@ class Floor {
 			if (team == heroes || team == (DBGlobal.TEAM_ENVIRONMENT : Int) || team == (DBGlobal.TEAM_3 : Int))
 				continue;
 			var position = npc.position;
-			var gm = npc.gmNpc;
-			out.push(new Monster(npc.id, gm == null || gm.Name == null ? "" : gm.Name, position == null ? 0 : position.x,
-				position == null ? 0 : position.y, gm != null && gm.HasHealthbar));
+			out.push(new Monster(foe.id, foe.name, position == null ? 0 : position.x, position == null ? 0 : position.y, foe.healthBar));
 		}
 		return out;
 	}
