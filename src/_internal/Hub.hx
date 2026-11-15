@@ -1,8 +1,10 @@
 package mods.api._internal;
 
+import actor.stateMachine.ActorDeadState;
 import brain.gameObject.GameObject;
 import brain.stateMachine.State;
 import brain.stateMachine.StateMachine;
+import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
 import distributedObjects.HeroGameObject;
 import distributedObjects.HeroGameObjectOwner;
@@ -13,6 +15,7 @@ import modding.ModSubscription;
 import mods.api.account.Account;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.dungeon.Monster;
 import mods.api.dungeon.Player;
 import mods.api.State;
 import mods.api.Subscription;
@@ -30,6 +33,15 @@ class Hub {
 	static inline final HERO_SPAWNED = "heroSpawned";
 
 	static inline final HERO_DESPAWNED = "heroDespawned";
+
+	static inline final MONSTER_SPAWNED = "monsterSpawned";
+
+	static inline final MONSTER_HURT = "monsterHurt";
+
+	static inline final MONSTER_DESPAWNED = "monsterDespawned";
+
+	/** The game's own event for an actor's hit points, sent each time they are set, under a name that ends with the actor's id. */
+	static inline final HP_UPDATE = "HpEvent_HP_UPDATE_";
 
 	static inline final FLOOR_ENTER = "floorEnter";
 
@@ -75,6 +87,9 @@ class Hub {
 	/** The NPCs ready on each floor now, by the floor's object id: what `Floor.monsters` picks from. */
 	static var foes:Map<String, Array<Foe>> = new Map();
 
+	/** The same NPCs by their own object id. */
+	static var foesById:Map<String, Foe> = new Map();
+
 	/** Floors ready without their tiles yet, which the server sends after them from the second floor on. */
 	static var tileless:Array<DistributedDungeonFloor> = [];
 
@@ -119,6 +134,10 @@ class Hub {
 		// The end screen's next dungeon goes there without the town.
 		else if (Std.isOfType(state, LoadingScreenState))
 			forgetPlayers();
+		else if (Std.isOfType(state, ActorDeadState)) {
+			var dead:ActorDeadState = cast state;
+			foeDied(@:privateAccess dead.mActorGameObject);
+		}
 	}
 
 	static function stateExit(machine:StateMachine, state:State):Void {
@@ -284,7 +303,7 @@ class Hub {
 		hero.detach();
 	}
 
-	/** An NPC is ready on its floor, which may not have entered yet. */
+	/** An NPC is ready on its floor, which may not have entered yet: its mods hear of it once it has. */
 	static function foeReady(object:NPCGameObject):Void {
 		var floor = object.distributedDungeonFloor;
 		if (floor == null)
@@ -295,20 +314,89 @@ class Hub {
 			list = [];
 			foes.set(key, list);
 		}
-		list.push(new Foe(object));
+		var foe = new Foe(object);
+		list.push(foe);
+		foesById.set(Std.string(foe.id), foe);
+		if (floors.exists(key))
+			tellFoe(foe, floor);
+	}
+
+	/** Tells the mods of an enemy of the heroes, once. */
+	static function tellFoe(foe:Foe, floor:DistributedDungeonFloor):Void {
+		if (foe.told)
+			return;
+		var avatar = floor.activeOwnerAvatar;
+		if (!foe.living(avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team))
+			return;
+		foe.told = true;
+		hookFoe(foe);
+		if (heard(MONSTER_SPAWNED))
+			emit(MONSTER_SPAWNED, foe.copy());
+	}
+
+	/** Tells the mods an enemy they were told of is no longer one, once: dead, gone, or its floor over. */
+	static function untellFoe(foe:Foe):Void {
+		if (!foe.told || foe.left)
+			return;
+		foe.left = true;
+		unhookFoe(foe);
+		if (heard(MONSTER_DESPAWNED))
+			emit(MONSTER_DESPAWNED, foe.last());
+	}
+
+	static function foeDied(object:Dynamic):Void {
+		if (object == null)
+			return;
+		var foe:Null<Foe> = foesById.get(Std.string(object.id));
+		if (foe != null)
+			untellFoe(foe);
 	}
 
 	static function foeGone(object:NPCGameObject):Void {
+		var key = Std.string(object.id);
+		var foe:Null<Foe> = foesById.get(key);
+		if (foe == null)
+			return;
+		untellFoe(foe);
+		foesById.remove(key);
 		for (list in foes) {
 			var known:Array<Foe> = list;
-			for (i in 0...known.length) {
-				var foe:Foe = known[i];
-				if (foe.npc == object) {
-					known.splice(i, 1);
-					return;
-				}
-			}
+			if (known.remove(foe))
+				return;
 		}
+	}
+
+	/** Listens to a told monster's hit points, which a read of the floor's monsters then has without asking the game. */
+	static function hookFoe(foe:Foe):Void {
+		var facade = facade();
+		if (facade == null || foe.listener != null)
+			return;
+		foe.hp = foe.npc.hitPoints;
+		foe.listener = function(event:Dynamic) hpSet(foe, event.hp);
+		facade.eventManager.addEventListener(HP_UPDATE + Std.string(foe.id), foe.listener);
+	}
+
+	static function unhookFoe(foe:Foe):Void {
+		var facade = facade();
+		if (facade == null || foe.listener == null)
+			return;
+		facade.eventManager.removeEventListener(HP_UPDATE + Std.string(foe.id), foe.listener);
+		foe.listener = null;
+	}
+
+	/** The game set a monster's hit points: told when they changed. */
+	static function hpSet(foe:Foe, hp:UInt):Void {
+		if (hp == foe.hp)
+			return;
+		foe.hp = hp;
+		if (heard(MONSTER_HURT))
+			emit(MONSTER_HURT, foe.last());
+	}
+
+	/** Whether a mod listens to an event, so that nothing is made for none. */
+	static function heard(event:String):Bool {
+		var list = listeners.get(event);
+		return list != null && list.length > 0;
 	}
 
 	/** A floor enters once it has its tiles. */
@@ -348,12 +436,22 @@ class Hub {
 		floors.set(Std.string(object.id), floor);
 		state.setFloor(floor);
 		emit(FLOOR_ENTER, floor);
+		var known:Null<Array<Foe>> = foes.get(Std.string(object.id));
+		if (known != null)
+			for (foe in known.copy())
+				tellFoe(foe, object);
 	}
 
 	static function floorExit(object:DistributedDungeonFloor):Void {
 		settle(object);
 		var key = Std.string(object.id);
+		var known:Null<Array<Foe>> = foes.get(key);
 		foes.remove(key);
+		if (known != null)
+			for (foe in known) {
+				untellFoe(foe);
+				foesById.remove(Std.string(foe.id));
+			}
 		var floor = floors.get(key);
 		if (floor == null)
 			return;

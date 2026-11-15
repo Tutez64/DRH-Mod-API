@@ -1,8 +1,6 @@
 package mods.api.dungeon;
 
-import dBGlobals.DBGlobal;
 import distributedObjects.DistributedDungeonFloor;
-import distributedObjects.NPCGameObject;
 import mods.api._internal.Foe;
 import mods.api._internal.Hub;
 
@@ -100,19 +98,11 @@ class Floor {
 		var known:Null<Array<Foe>> = Hub.foes.get(Std.string(id));
 		if (known == null)
 			return out;
-		var avatar = floor.activeOwnerAvatar;
-		var heroes:Int = avatar == null ? (DBGlobal.TEAM_1 : Int) : avatar.team;
+		// Those the mods were told of and not told gone: the events and this list are one account.
 		for (i in 0...known.length) {
 			var foe:Foe = known[i];
-			var npc:NPCGameObject = foe.npc;
-			if (npc.isDestroyed || npc.isDead())
-				continue;
-			// Teams besides the heroes': props (environment), and traps that hurt everyone (the third team).
-			var team = npc.team;
-			if (team == heroes || team == (DBGlobal.TEAM_ENVIRONMENT : Int) || team == (DBGlobal.TEAM_3 : Int))
-				continue;
-			var position = npc.position;
-			out.push(new Monster(foe.id, foe.name, position == null ? 0 : position.x, position == null ? 0 : position.y, foe.healthBar));
+			if (foe.told && !foe.left)
+				out.push(foe.copy());
 		}
 		return out;
 	}

@@ -4,6 +4,7 @@ import modding.ModContext;
 import mods.api._internal.Hub;
 import mods.api.dungeon.Floor;
 import mods.api.dungeon.Hero;
+import mods.api.dungeon.Monster;
 import mods.api.settings.Keys;
 import mods.api.settings.Settings;
 import openfl.display.Sprite;
@@ -107,6 +108,21 @@ class Context {
 	/** A hero leaves the floor. Its wrapper still reads it in the handlers, empty after them; its player stays. */
 	public function onHeroDespawned(handler:Hero->Void):Subscription {
 		return Hub.listen(core, Hub.HERO_DESPAWNED, handler);
+	}
+
+	/** An enemy of the heroes is ready on the floor, copied then. Always after that floor's `onFloorEnter`. */
+	public function onMonsterSpawned(handler:Monster->Void):Subscription {
+		return Hub.listen(core, Hub.MONSTER_SPAWNED, handler);
+	}
+
+	/** The hit points of a monster told as spawned changed, down or up. It is copied then. */
+	public function onMonsterHurt(handler:Monster->Void):Subscription {
+		return Hub.listen(core, Hub.MONSTER_HURT, handler);
+	}
+
+	/** A monster told as spawned died or left, or its floor ends: once for each, before that floor's `onFloorExit`. */
+	public function onMonsterDespawned(handler:Monster->Void):Subscription {
+		return Hub.listen(core, Hub.MONSTER_DESPAWNED, handler);
 	}
 
 	/** A dungeon floor starts: its grid is built and its map node set. Art may still be loading. */

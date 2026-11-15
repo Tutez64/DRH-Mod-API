@@ -46,9 +46,12 @@ Each `on…` returns a `Subscription`: `cancel()` stops it, a second call does n
 | `onFloorEnter`, `onFloorExit` | `Floor->Void` | A dungeon floor starts, its grid built (its art may still be loading), and ends. |
 | `onHeroSpawned` | `Hero->Void` | A hero, local or of another player, is on a dungeon floor and ready. Always after its floor's `onFloorEnter`. |
 | `onHeroDespawned` | `Hero->Void` | A hero leaves the floor. It still reads in the handlers, empty after them. |
+| `onMonsterSpawned` | `Monster->Void` | An enemy of the heroes, as `floor.monsters` lists them, is ready on the floor. Always after its floor's `onFloorEnter`. |
+| `onMonsterHurt` | `Monster->Void` | The hit points of a monster told as spawned changed, down or up. |
+| `onMonsterDespawned` | `Monster->Void` | A monster told as spawned died or left, or its floor ends: once for each, before its floor's `onFloorExit`. |
 | `onKeyDown` | `UInt->Bool` | A key goes down, with its OpenFL key code: once per press, not for a held key's repeats, not while a text field such as the chat has focus. Return true to keep the key: the game never sees that press. For the keys of a mod's own window while it is open, such as Enter and Escape: a shortcut is a [key action](#keys). |
 
-Order: `init`, `onTablesLoaded`, `ready`, then everything else. A hero always comes after its floor. Town has no heroes.
+Order: `init`, `onTablesLoaded`, `ready`, then everything else. A hero and a monster always come after their floor. Town has neither. A monster's events hand it [copied](#monster) at that moment: tell one from another by its `id`.
 
 ## State
 
@@ -89,7 +92,7 @@ A square room of a floor, copied when read.
 
 ### Monster
 
-A living enemy of the heroes, copied when read. The game has no reliable notion of a boss: tell one by its `name`, and its dungeon by the floor's `map`.
+A living enemy of the heroes, copied when read or when an event hands it. The game has no reliable notion of a boss: tell one by its `name`, and its dungeon by the floor's `map`.
 
 | Member | What |
 | --- | --- |
@@ -97,6 +100,7 @@ A living enemy of the heroes, copied when read. The game has no reliable notion 
 | `name` | Its name in the game's data, such as `Golem Boss`. |
 | `x`, `y` | World position, in the coordinates of a hero's `x` and `y`. |
 | `healthBar` | Whether the game shows a health bar over it, as it does for the big ones: bosses, minibosses, and some others. |
+| `hp`, `maxHp` | Its hit points, and what they are when it is whole, with what its buffs add. |
 
 ### Hero
 

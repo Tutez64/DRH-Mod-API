@@ -16,12 +16,20 @@ class Monster {
 	/** Whether the game shows a health bar over it, as it does for the big ones: not only bosses. */
 	public var healthBar(default, null):Bool;
 
-	@:allow(mods.api.dungeon.Floor)
-	function new(id:UInt, name:String, x:Float, y:Float, healthBar:Bool) {
+	/** Its hit points, 0 once dead. */
+	public var hp(default, null):UInt;
+
+	/** Its hit points when whole, with what its buffs add. */
+	public var maxHp(default, null):UInt;
+
+	@:allow(mods.api)
+	function new(id:UInt, name:String, x:Float, y:Float, healthBar:Bool, hp:UInt, maxHp:UInt) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.healthBar = healthBar;
+		this.hp = hp;
+		this.maxHp = maxHp;
 	}
 }
