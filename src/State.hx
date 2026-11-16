@@ -35,7 +35,8 @@ class State {
 
 	var playerList:Array<Player> = [];
 
-	public function new() {}
+	@:allow(mods.api._internal.Hub)
+	function new() {}
 
 	function get_inTown():Bool {
 		return Hub.inTown;
