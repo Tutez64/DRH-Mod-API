@@ -7,23 +7,25 @@ import account.StackableInfo;
 import mods.api._internal.Hub;
 
 /**
- * What the account owns, read live from `ready`. Each list is a copy, in no particular order; what is
- * equipped is on its hero in `heroes`. Coins, gems and trophies are on `Account`.
+ * What the account owns. Each list is a copy, in no particular order. Coin and XP boosters, chests and
+ * keys are not covered yet.
+ *
+ * @since 1.0
  */
 class Inventory {
-	/** Weapons in storage, not equipped. Their `slot` is -1. */
-	public var weapons(get, never):Array<Weapon>;
-
-	/** Size of the weapon storage. Unopened chests take room in it too. */
-	public var weaponLimit(get, never):UInt;
-
 	/** The account's heroes, with what each has equipped. */
 	public var heroes(get, never):Array<OwnedHero>;
+
+	/** Weapons in storage, not equipped (`slot` -1). */
+	public var weapons(get, never):Array<Weapon>;
+
+	/** Size of the weapon storage; unopened chests take room in it too. */
+	public var weaponLimit(get, never):UInt;
 
 	/** Pets in storage, not equipped. */
 	public var pets(get, never):Array<Pet>;
 
-	/** Consumables in storage, not equipped: potions and bombs for the dungeon. Coin and XP boosters are not listed. */
+	/** Consumables in storage: potions and bombs. */
 	public var consumables(get, never):Array<Stack>;
 
 	@:allow(mods.api.account.Account)

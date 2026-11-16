@@ -4,28 +4,36 @@ import distributedObjects.DistributedDungeonFloor;
 import mods.api._internal.Foe;
 import mods.api._internal.Hub;
 
-/** The dungeon floor in progress. Not town. */
+/**
+ * A dungeon floor.
+ *
+ * @since 1.0
+ */
 class Floor {
+	/** The floor's object id. */
 	public var id(default, null):UInt;
 
 	/** 1-based index of the floor inside its dungeon. */
 	public var number(get, never):Int;
 
-	/** GameMaster map-node constant, empty when the floor is already gone. */
+	/** The game's map node constant; empty once the floor is gone. */
 	public var map(get, never):String;
 
 	/**
-	 * The floor's tiles as the server laid them out, read now: a copy. Filler the server sends is in it,
-	 * not the filler the game adds on its own around the floor. Empty once the floor is gone.
+	 * Its tiles as the server laid them out, read now: the whole floor from the start, rooms not reached
+	 * yet included. Filler the server sends is in it, not the filler the game adds on its own around the
+	 * floor. Empty once the floor is gone. A copy.
+	 * @since 1.1
 	 */
 	public var tiles(get, never):Array<Tile>;
 
 	/**
-	 * The heroes' living enemies the game knows on the floor, read now: a copy. Rooms not reached yet
-	 * are in it, monsters a generator spawns later too, and anything of the foes' team, such as the
-	 * Cracked Walls guarding the Golem in Twisted Jungle Boss or the Barrel Monsters of Knight Fortress
-	 * Boss; not breakable props, nor traps that hurt everyone. None yet at `onFloorEnter`; empty once the
-	 * floor is gone.
+	 * The heroes' living enemies the game knows on the floor, read now: rooms not reached yet included,
+	 * and those a generator spawns later. Anything of the foes' team, such as the Cracked Walls guarding
+	 * the Golem in Twisted Jungle Boss or the Barrel Monsters of Knight Fortress Boss; not breakable
+	 * props, nor traps that hurt everyone. None yet at `onFloorEnter`; empty once the floor is gone. A
+	 * copy.
+	 * @since 1.1
 	 */
 	public var monsters(get, never):Array<Monster>;
 

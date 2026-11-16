@@ -6,11 +6,27 @@ import mods.api._internal.ModOptions;
 import mods.api._internal.Options;
 
 /**
- * `context.settings`: a mod's options, shown in the game's settings menu and kept in the mod's data
- * folder. Declare them in `init`: each answers its value from then on.
+ * `context.settings` declares a mod's options. The game's settings menu shows them in its MODS tab
+ * (ADVANCED before DRH 18, which has no such tab), under a header with the mod's name, and the player
+ * sets them there as the game's own. Declare them in `init`: each answers its value from then on, read
+ * from the mod's `settings.json`.
  *
- * An `id` names the option in the mod's file: keep it across versions. The label and the description
- * are what the menu shows, the label after the mod's name.
+ * `id` names the option in the mod's file: unique among the mod's options, and the same across its
+ * versions. Another mod may use the same. `label` is the row's title, shown in capitals on one line:
+ * about 15 characters fit a slider, 19 the others, and a longer one is made smaller, then cut.
+ * `description` shows under a flag's label only: the game's rows for a choice, a slider and a key have
+ * no room for one. A declaration that cannot be shown throws: an id declared twice, no choices, a
+ * default that is not one of them, an empty range.
+ *
+ * The menu's reset puts every option back to its declared default. An option the mod no longer
+ * declares stays in the file, ignored.
+ *
+ * The file is the `api`'s: it writes it whole at the first change, and nothing else stays in it. A mod
+ * that kept a `settings.json` of its own before reads it in `init`, then gives each option the value it
+ * had (`flag.value = ...`), so the player's choices carry over; whatever else it kept there goes to
+ * another file.
+ *
+ * @since 1.3
  */
 class Settings {
 	var owner:ModOptions;
@@ -31,8 +47,9 @@ class Settings {
 	}
 
 	/**
-	 * One value among several: `choices` gives each value and the label the menu shows for it, such as
-	 * `[{value: "en", label: "English"}, {value: "es", label: "Spanish"}]`.
+	 * One value among `choices`, each `{value, label}`, both text:
+	 * `[{value: "en", label: "English"}, {value: "es", label: "Spanish"}]`. The menu shows the labels, in
+	 * capitals, and they differ.
 	 */
 	public function choice(id:String, label:String, description:String, choices:Array<Dynamic>, defaultValue:String):Choice {
 		if (choices == null || choices.length == 0)
@@ -63,18 +80,7 @@ class Settings {
 		return new Choice(entry);
 	}
 
-	/**
-	 * A row that is a button, such as one that opens the mod's own window: `label` names the row,
-	 * `caption` is written on the button. It holds no value. Only DRH 18 and later show it (`shown`).
-	 */
-	public function button(id:String, label:String, caption:String):Button {
-		var entry = owner.add(Entry.BUTTON, id, label, "");
-		entry.caption = caption == null ? "" : caption;
-		Options.declared(entry);
-		return new Button(entry);
-	}
-
-	/** A number from `minimum` to `maximum` by `step`, shown with `decimals` digits after the point. */
+	/** A number in a range, shown with `decimals` digits after the point. */
 	public function slider(id:String, label:String, description:String, minimum:Float, maximum:Float, step:Float, defaultValue:Float,
 			decimals:Int = 0):Slider {
 		if (!(maximum > minimum) || !(step > 0))
@@ -89,5 +95,17 @@ class Settings {
 		entry.value = Std.isOfType(stored, Float) ? Slider.within(entry, stored) : entry.defaultValue;
 		Options.declared(entry);
 		return new Slider(entry);
+	}
+
+	/**
+	 * A row that is a button, with `caption` written on it, such as one that opens the mod's own window.
+	 * It holds no value.
+	 * @since 1.4
+	 */
+	public function button(id:String, label:String, caption:String):Button {
+		var entry = owner.add(Entry.BUTTON, id, label, "");
+		entry.caption = caption == null ? "" : caption;
+		Options.declared(entry);
+		return new Button(entry);
 	}
 }

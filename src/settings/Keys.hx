@@ -7,12 +7,18 @@ import mods.api._internal.ModOptions;
 import mods.api._internal.Options;
 
 /**
- * `context.keys`: a mod's key actions, which the player rebinds in the CONTROLS tab of the game's
- * settings menu. Declare them in `init`.
+ * `context.keys` declares a mod's key actions. The game's settings menu shows them at the end of
+ * CONTROLS, under a header with the mod's name, and the player rebinds them there. Declare them in
+ * `init`.
  *
- * A mod is told when its action is pressed: it never reads a key code. A key is one action's, the
- * game's own included: binding one takes it from the action that had it, and an action whose key is
- * already held when it is declared starts with none.
+ * A mod never reads the key code: the player may have changed it, or given the action a second key.
+ *
+ * A key is one action's, the game's own included. Binding a key in the menu takes it from the action
+ * that had it. An action whose key is already held when its mod loads, by the game or by a mod loaded
+ * before, starts with none, and has it at a later start once it is free: do not declare a key the game
+ * uses. The menu compares the key alone: R and Shift+R are the same key.
+ *
+ * @since 1.3
  */
 class Keys {
 	var owner:ModOptions;
@@ -23,11 +29,10 @@ class Keys {
 	}
 
 	/**
-	 * An action, with the key it has until the player changes it: an OpenFL key code, such as
-	 * `Keyboard.F6`. Escape, Enter, F8 and F11 cannot be bound.
-	 *
-	 * `shift`, `ctrl` and `alt` are the modifiers a press needs held. The player cannot change them yet
-	 * and will later, so the action must make sense without them.
+	 * A key action. `key` is the OpenFL key code it has until the player changes it, such as
+	 * `Keyboard.F6`; Escape, Enter, F8 and F11 cannot be bound, and declaring one throws. `shift`, `ctrl`
+	 * and `alt` are the modifiers a press needs held, which the row's title names (`RESTART (SHIFT+)`).
+	 * The player cannot change them yet and will later: the action must make sense without them.
 	 */
 	public function action(id:String, label:String, description:String, key:UInt, shift:Bool = false, ctrl:Bool = false, alt:Bool = false):KeyAction {
 		var code:Int = key;

@@ -1,11 +1,13 @@
 package mods.api.account;
 
-/** Some of one stackable item, such as a potion or a bomb, copied when read. */
+/**
+ * Some of one stackable item, such as a potion or a bomb.
+ *
+ * @since 1.0
+ */
 class Stack {
-	/** GameMaster stackable id. */
+	/** The game's item id and its name. */
 	public var id(default, null):UInt;
-
-	/** Display name, as the inventory shows it. */
 	public var name(default, null):String;
 
 	public var count(default, null):UInt;

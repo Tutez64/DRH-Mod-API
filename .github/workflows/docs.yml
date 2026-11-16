@@ -1,0 +1,30 @@
+# Fails when docs/api.md is not what the comments of src/ give, when a `@since`
+# contradicts the release tags, or when a member of the last release is gone
+# without a new major. The steps live in tools/apidoc.hxml.
+name: Docs
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # The whole history: the `@since` are set against every release tag.
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - uses: krdlab/setup-haxe@18e4b483cfffca2fb8881530bf8a6cec39dac8fb # v2.1.1
+        with:
+          haxe-version: 4.3.7
+
+      - name: Install the parser
+        run: haxelib git haxeparser https://github.com/HaxeCheckstyle/haxeparser 49db59c303242c7e6ef1293e35ac5983f31f654d --quiet
+
+      - name: Check
+        run: haxe tools/apidoc.hxml check

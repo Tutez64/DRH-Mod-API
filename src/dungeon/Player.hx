@@ -14,12 +14,13 @@ import uI.popup.DBUITwoButtonPopup;
 import uI.popup.UIReportPopup;
 
 /**
- * A player met in the dungeon in progress, the local one included. One instance per account from
- * its first hero until the dungeon is left, kept after the player has left: `hero` is then null,
- * and the rest holds what was last read from their hero.
+ * A player met in the dungeon in progress, the local one included, kept once they have left: `hero` is
+ * then null, and the rest holds what was last read from their hero.
  *
- * `addFriend`, `block` and `report` act as the end screen does. Each returns false when there is
- * nobody to act on (the local player). `sent` runs once the server accepted, never on cancel or error.
+ * `addFriend`, `block` and `report` return false when there is nobody to act on (the local player).
+ * `sent` runs once the server accepted, never on cancel or error.
+ *
+ * @since 1.0
  */
 class Player {
 	public var accountId(default, null):UInt;
@@ -30,7 +31,7 @@ class Player {
 	/** Screen name. */
 	public var name(get, never):String;
 
-	/** The player's hero on the current floor; null between floors and once they have left. */
+	/** Its hero on the current floor; null between floors and once the player has left. */
 	public var hero(default, null):Null<Hero>;
 
 	/** Whether the local account has this player as a friend. */
@@ -85,18 +86,16 @@ class Player {
 		return facade != null && facade.dbAccountInfo != null && facade.dbAccountInfo.isFriend(accountId);
 	}
 
-	/**
-	 * The player's picture, as on the end screen: the icon of their hero's skin, centred in a `size`
-	 * square. It needs no cleanup: drop it like any sprite.
-	 */
+	/** The player's picture, as on the end screen: the icon of their hero's skin, centred in a `size` square. */
 	public function createPortrait(size:Float):Sprite {
 		remember();
 		return Art.skinPortrait(knownSkin, size);
 	}
 
 	/**
-	 * The ascension star of the player's hero with its number, as the game shows it by a portrait,
-	 * centred in a `size` square. Empty for a hero that never ascended. Dropped like the portrait.
+	 * The ascension star of their hero with its number, as the game shows it by a portrait, centred in a
+	 * `size` square. Empty for a hero that never ascended.
+	 * @since 1.4
 	 */
 	public function createAscensionStar(size:Float):Sprite {
 		remember();
@@ -152,8 +151,8 @@ class Player {
 	}
 
 	/**
-	 * Opens the game's report popup. The match lists the players with a hero on the floor, plus this
-	 * one if they have left, close to the end screen's four slots.
+	 * Opens the game's report popup. The match lists the players with a hero on the floor, plus this one
+	 * if they have left, close to the end screen's four slots.
 	 */
 	public function report(?sent:Void->Void):Bool {
 		var facade = actor();

@@ -4,33 +4,38 @@ import distributedObjects.HeroGameObject;
 import mods.api.account.Weapon;
 
 /**
- * One hero on a dungeon floor: what a player plays there. Each floor gives a new one. Fields read
- * the live object and go empty after the `heroDespawned` handlers; the player behind it stays in `player`.
+ * A hero on a dungeon floor. Fields read the live hero and go empty after the `onHeroDespawned`
+ * handlers.
+ *
+ * @since 1.0
  */
 class Hero {
-	/** The hero's object id on the floor, not an account: see `player`. */
+	/** The hero's object id on the floor, not an account. */
 	public var id(default, null):UInt;
 
 	/** True for the local player's hero. */
 	public var local(default, null):Bool;
 
-	/** The player playing this hero. Null only if the game sent no account for it. */
+	/** Its player; null only if the game sent no account for it. */
 	public var player(default, null):Null<Player>;
 
-	/** GameMaster hero class id, 0 once the hero is gone. */
+	/** The hero class: the game's id and the name it shows. */
 	public var classId(get, never):UInt;
-
-	/** Name of the hero class, as the game shows it. Empty once the hero is gone. */
 	public var className(get, never):String;
 
 	public var level(get, never):UInt;
 
-	/** How many times the hero ascended: the number in its star. 0 for a hero that never did, and once the hero is gone. */
+	/**
+	 * How many times the hero ascended: the number in its star. 0 for a hero that never did.
+	 * @since 1.4
+	 */
 	public var ascension(get, never):UInt;
 
-	/** World position; 0 once the hero is gone. */
+	/**
+	 * World position; 0 once gone.
+	 * @since 1.1
+	 */
 	public var x(get, never):Float;
-
 	public var y(get, never):Float;
 
 	/** Equipped weapons by slot, empty slots left out. A copy. */

@@ -7,27 +7,33 @@ import mods.api.dungeon.Hero;
 import mods.api.dungeon.Player;
 
 /**
- * Live window handed to every mod.
+ * The live game, read now: `context.state`, shared by every mod.
  *
- * Account is filled at `ready`. Hero and floor wrappers stay absent until the
- * matching event. Adding a field later is a minor version of `api`.
+ * A hero and its player are two objects: a `Hero` is what a player plays on one floor, and each floor
+ * gives a new one; its `Player` is the account behind it, the same from its first hero to the end of
+ * the dungeon.
+ *
+ * @since 1.0
  */
 class State {
-	/** Account-level reading. Null until `ready`. */
+	/** The account, null until `ready`. */
 	public var account(default, null):Null<Account>;
 
-	/** Whether the game is in town: true from `onTownEnter` to `onTownExit`. */
+	/**
+	 * Whether the game is in town: true from `onTownEnter` to `onTownExit`.
+	 * @since 1.2
+	 */
 	public var inTown(get, never):Bool;
 
-	/** Dungeon floor in progress. Null in town and until `floorEnter`. */
+	/** The dungeon floor in progress; null in town. */
 	public var floor(default, null):Null<Floor>;
 
-	/** Heroes currently on a dungeon floor, local and remote. A copy: changing it changes nothing. */
+	/** The heroes on the floor, local and remote. A copy. */
 	public var heroes(get, never):Array<Hero>;
 
 	/**
-	 * Players met in the dungeon in progress, in order of arrival, those who left included. Emptied
-	 * when it is left, for the town or for another dungeon. A copy.
+	 * The players met in the dungeon in progress, in order of arrival, those who left included; emptied
+	 * when it is left, for the town (before `onTownEnter`) or for another dungeon. A copy.
 	 */
 	public var players(get, never):Array<Player>;
 

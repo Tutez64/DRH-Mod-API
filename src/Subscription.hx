@@ -3,7 +3,11 @@ package mods.api;
 import modding.ModContext;
 import mods.api._internal.Hub;
 
-/** What every `Context.on*` returns. `cancel` stops the handler; a second call does nothing. */
+/**
+ * What subscribing a handler returns, such as each `on...` of `Context`.
+ *
+ * @since 1.0
+ */
 class Subscription {
 	/** False once cancelled, or once the mod that subscribed failed. */
 	public var active(get, never):Bool;
@@ -27,6 +31,7 @@ class Subscription {
 		return !cancelled && owner.alive;
 	}
 
+	/** Stops the handler; a second call does nothing. */
 	public function cancel():Void {
 		if (cancelled)
 			return;

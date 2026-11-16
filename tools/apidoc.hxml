@@ -1,0 +1,8 @@
+# Writes the reference of docs/api.md from the comments of src/, run from the mod's folder:
+#   haxe tools/apidoc.hxml          writes it
+#   haxe tools/apidoc.hxml check    only tells whether it is up to date
+# Its parser is not released for Haxe 4.3, so it comes from its repository:
+#   haxelib git haxeparser https://github.com/HaxeCheckstyle/haxeparser 49db59c303242c7e6ef1293e35ac5983f31f654d
+-cp tools
+-lib haxeparser
+--run ApiDoc

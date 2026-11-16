@@ -9,35 +9,32 @@ import flash.errors.Error;
 import mods.api._internal.Hub;
 
 /**
- * A hero of the account, copied when read, with what it carries into a dungeon. Not a hero on a
- * floor: that is `Hero`.
+ * A hero of the account, copied when read, with what it carries into a dungeon; not a `Hero` on a
+ * floor.
+ *
+ * @since 1.0
  */
 class OwnedHero {
-	/** The account's id for this hero, as in `Account.activeAvatarId`. */
+	/** As `Account.activeAvatarId`. */
 	public var id(default, null):UInt;
 
-	/** GameMaster hero class id, as `Hero.classId`. */
+	/** As on `Hero`. */
 	public var classId(default, null):UInt;
-
-	/** Name of the hero class, as the game shows it. */
 	public var className(default, null):String;
-
-	/** Level as the game shows it, past 100 with ascension. */
 	public var level(default, null):UInt;
 
-	/** How many times the hero ascended, 0 if never. */
+	/**
+	 * As `Hero.ascension`.
+	 * @since 1.4
+	 */
 	public var ascension(default, null):UInt;
 
-	/** GameMaster skin id. */
+	/** The game's skin id. */
 	public var skinId(default, null):UInt;
 
-	/** Equipped weapons by slot, empty slots left out. */
+	/** Equipped, by slot, empty slots left out. */
 	public var weapons(default, null):Array<Weapon> = [];
-
-	/** Equipped pets. */
 	public var pets(default, null):Array<Pet> = [];
-
-	/** Equipped consumables by slot, empty slots left out. */
 	public var consumables(default, null):Array<Stack> = [];
 
 	/** A pet move in progress, of any mod: one at a time. */
@@ -62,10 +59,12 @@ class OwnedHero {
 	}
 
 	/**
-	 * Equips `pet` on this hero, in town, as the inventory does but without its popup: the pet this hero
-	 * carries goes back to storage, and `pet` leaves the hero carrying it. `done` runs once: true once the
-	 * server accepted, false on an error, which the game shows. Returns false when there is nothing to do:
-	 * out of town, `pet` already on this hero or not the account's, or a move still in progress.
+	 * Equips the pet on this hero, in town, as the inventory does but without its popup: the pet this
+	 * hero carries goes back to storage, and `pet` leaves the hero carrying it. `done` runs once: true
+	 * once the server accepted, false on an error, which the game shows. Returns false when there is
+	 * nothing to do: out of town, `pet` already on this hero or not the account's, or a move still in
+	 * progress, of any mod.
+	 * @since 1.2
 	 */
 	public function equipPet(pet:Pet, ?done:Bool->Void):Bool {
 		var facade = Hub.facade();

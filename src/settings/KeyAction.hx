@@ -5,12 +5,16 @@ import mods.api._internal.Entry;
 import mods.api._internal.Hub;
 import mods.api._internal.Options;
 
-/** A key action of `Keys.action`. */
+/**
+ * A key action, declared with `Keys.action`.
+ *
+ * @since 1.3
+ */
 class KeyAction {
 	/** Whether its key is down now, with its modifiers. */
 	public var held(get, never):Bool;
 
-	/** What is bound, as the menu names keys, to show to the player: "SHIFT+R", empty when nothing is. */
+	/** What is bound, as the menu names keys, to show the player: `"SHIFT+R"`, empty when nothing is. */
 	public var label(get, never):String;
 
 	var entry:Entry;
@@ -30,7 +34,7 @@ class KeyAction {
 
 	/**
 	 * The action is pressed: once per press, not for a held key's repeats, not while a text field such
-	 * as the chat has focus nor while the settings menu is open. The game never sees that press.
+	 * as the chat has focus, nor while the settings menu is open. The game never sees that press.
 	 */
 	public function onPress(handler:Void->Void):Subscription {
 		return Hub.listen(entry.owner.core, entry.event, handler == null ? null : function(_:Dynamic) handler());

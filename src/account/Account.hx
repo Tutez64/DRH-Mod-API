@@ -2,20 +2,23 @@ package mods.api.account;
 
 import facade.DBFacade;
 
-/** Account reading available from `ready`. Not a hero and not a floor. Fields read the live account. */
+/**
+ * The local account, from `ready`, read live.
+ *
+ * @since 1.0
+ */
 class Account {
 	public var id(get, never):UInt;
 
-	/** False when the account has no active avatar. `ready` still runs. */
+	/**
+	 * Whether a hero is selected in town, and its id (as `OwnedHero.id`), 0 when there is none; follows a
+	 * change of selection.
+	 */
 	public var hasActiveAvatar(get, never):Bool;
-
-	/** The avatar selected in town, 0 when there is none. Follows a change of selection. */
 	public var activeAvatarId(get, never):UInt;
 
 	public var coins(get, never):UInt;
-
 	public var gems(get, never):UInt;
-
 	public var trophies(get, never):UInt;
 
 	/** What the account owns. */

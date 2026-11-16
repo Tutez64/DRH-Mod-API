@@ -7,27 +7,28 @@ import gameMasterDictionary.GMWeaponItem;
 import mods.api._internal.Art;
 import mods.api._internal.Hub;
 
-/** One weapon, copied when read: it does not follow later changes. */
+/**
+ * A weapon, copied when read: it does not follow later changes.
+ *
+ * @since 1.0
+ */
 class Weapon {
 	/** 0-based slot on the hero carrying it, -1 in storage. */
 	public var slot(default, null):Int;
 
-	/** GameMaster weapon item id. */
+	/** The game's item id, and its name as the inventory shows it, without its modifiers. */
 	public var id(default, null):UInt;
-
-	/** Display name, as the inventory shows it, without its modifiers. */
 	public var name(default, null):String;
 
 	public var power(default, null):UInt;
-
 	public var requiredLevel(default, null):UInt;
 
-	/** GameMaster rarity constant, empty when unknown. */
+	/**
+	 * The game's rarity constant (empty when unknown), the text color it uses for it, and whether it is
+	 * legendary.
+	 */
 	public var rarity(default, null):String;
-
-	/** Text color the game uses for this rarity. */
 	public var rarityColor(default, null):UInt;
-
 	public var legendary(default, null):Bool;
 
 	var rarityId:UInt;
@@ -76,9 +77,8 @@ class Weapon {
 	}
 
 	/**
-	 * The game's icon for this weapon on its rarity background, centred in a `size` square. Hovering
-	 * it shows the game's weapon tooltip. The art appears once loaded; it needs no cleanup: drop it like
-	 * any sprite. Empty before `ready`.
+	 * The game's icon on its rarity background, centred in a `size` square; hovering it shows the game's
+	 * tooltip. Empty before `ready`.
 	 */
 	public function createIcon(size:Float):Sprite {
 		return Art.weaponIcon(id, power, requiredLevel, rarityId, modifier1, modifier2, legendaryModifier, size);

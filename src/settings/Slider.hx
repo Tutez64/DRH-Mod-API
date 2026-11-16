@@ -5,9 +5,16 @@ import mods.api._internal.Entry;
 import mods.api._internal.Hub;
 import mods.api._internal.Options;
 
-/** A number option of `Settings.slider`. */
+/**
+ * A number in a range, declared with `Settings.slider`.
+ *
+ * @since 1.3
+ */
 class Slider {
-	/** Its value now. Setting it shows in the menu and is kept, brought within its range. */
+	/**
+	 * Its value now. Setting it shows in the menu and is kept, as when the player sets it; one outside
+	 * its range is brought within it.
+	 */
 	public var value(get, set):Float;
 
 	var entry:Entry;
@@ -34,7 +41,10 @@ class Slider {
 		return kept;
 	}
 
-	/** The value changed: set by the player in the menu, by its reset, or by the mod. In town or during a run. */
+	/**
+	 * The value changed, with the new one: set by the player in the menu, by the menu's reset, or by the
+	 * mod. In town or during a run.
+	 */
 	public function onChange(handler:Float->Void):Subscription {
 		return Hub.listen(entry.owner.core, entry.event, handler);
 	}

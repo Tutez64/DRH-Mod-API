@@ -1,20 +1,23 @@
 package mods.api.account;
 
-/** One pet, copied when read. */
+/**
+ * A pet, copied when read.
+ *
+ * @since 1.0
+ */
 class Pet {
-	/** GameMaster npc id of the pet's kind. */
+	/** The game's id of the pet's kind, and its name as the inventory shows it. */
 	public var id(default, null):UInt;
-
-	/** This pet's own id in the account, unlike `id`, which every pet of its kind shares. */
-	public var uid(default, null):UInt;
-
-	/** Display name, as the inventory shows it. */
 	public var name(default, null):String;
 
+	/**
+	 * This pet's own id in the account, unlike `id`, which every pet of its kind shares.
+	 * @since 1.2
+	 */
+	public var uid(default, null):UInt;
+
 	public var attackRating(default, null):UInt;
-
 	public var defenseRating(default, null):UInt;
-
 	public var speedRating(default, null):UInt;
 
 	@:allow(mods.api.account.Inventory, mods.api.account.OwnedHero)
