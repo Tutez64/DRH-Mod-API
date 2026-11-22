@@ -110,7 +110,7 @@ class Hero {
 			var detail = details[slot];
 			if (detail == null || detail.type == 0)
 				continue;
-			out.push(Weapon.read(slot, detail.type, detail.power, detail.requiredlevel, detail.rarity, detail.modifier1, detail.modifier2,
+			out.push(Weapon.read(slot, detail.type, 0, detail.power, detail.requiredlevel, detail.rarity, detail.modifier1, detail.modifier2,
 				detail.legendarymodifier));
 		}
 		return out;

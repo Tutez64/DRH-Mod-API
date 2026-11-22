@@ -16,9 +16,16 @@ class Weapon {
 	/** 0-based slot on the hero carrying it, -1 in storage. */
 	public var slot(default, null):Int;
 
-	/** The game's item id, and its name as the inventory shows it, without its modifiers. */
+	/** The game's id of the weapon's kind, and its name as the inventory shows it, without its modifiers. */
 	public var id(default, null):UInt;
 	public var name(default, null):String;
+
+	/**
+	 * This weapon's own id in the account, unlike `id`, which every weapon of its kind shares, however alike
+	 * two of them are. 0 for a weapon a hero carries in a dungeon, which the game only knows by its kind.
+	 * @since 1.6
+	 */
+	public var uid(default, null):UInt;
 
 	public var power(default, null):UInt;
 	public var requiredLevel(default, null):UInt;
@@ -41,7 +48,7 @@ class Weapon {
 
 	/** Names and rarity from the GameMaster, read now. */
 	@:allow(mods.api.dungeon.Hero, mods.api.account.Inventory, mods.api.account.OwnedHero)
-	static function read(slot:Int, id:UInt, power:UInt, requiredLevel:UInt, rarityId:UInt, modifier1:UInt, modifier2:UInt,
+	static function read(slot:Int, id:UInt, uid:UInt, power:UInt, requiredLevel:UInt, rarityId:UInt, modifier1:UInt, modifier2:UInt,
 			legendaryModifier:UInt):Weapon {
 		var facade = Hub.facade();
 		var gameMaster = facade == null ? null : facade.gameMaster;
@@ -56,14 +63,15 @@ class Weapon {
 			rarity = cast gameMaster.rarityById.itemFor(rarityId);
 		}
 		var color:UInt = rarity != null && rarity.TextColor != 0 ? rarity.TextColor : 15463921;
-		return new Weapon(slot, id, name == null ? "" : name, power, requiredLevel, rarity == null || rarity.Constant == null ? "" : rarity.Constant,
+		return new Weapon(slot, id, uid, name == null ? "" : name, power, requiredLevel, rarity == null || rarity.Constant == null ? "" : rarity.Constant,
 			color, rarityId, modifier1, modifier2, legendaryModifier);
 	}
 
-	function new(slot:Int, id:UInt, name:String, power:UInt, requiredLevel:UInt, rarity:String, rarityColor:UInt, rarityId:UInt, modifier1:UInt,
-			modifier2:UInt, legendaryModifier:UInt) {
+	function new(slot:Int, id:UInt, uid:UInt, name:String, power:UInt, requiredLevel:UInt, rarity:String, rarityColor:UInt, rarityId:UInt,
+			modifier1:UInt, modifier2:UInt, legendaryModifier:UInt) {
 		this.slot = slot;
 		this.id = id;
+		this.uid = uid;
 		this.name = name;
 		this.power = power;
 		this.requiredLevel = requiredLevel;

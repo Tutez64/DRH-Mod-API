@@ -91,7 +91,7 @@ class Inventory {
 	static function weapon(item:ItemInfo, slot:Int):Weapon {
 		var rarity = item.rarity;
 		var modifiers = item.modifiers;
-		return Weapon.read(slot, item.gmId, item.power, item.requiredLevel, rarity == null ? 0 : rarity.Id,
+		return Weapon.read(slot, item.gmId, item.databaseId, item.power, item.requiredLevel, rarity == null ? 0 : rarity.Id,
 			modifiers.length > 0 ? modifiers[0].Id : 0, modifiers.length > 1 ? modifiers[1].Id : 0, item.legendaryModifier);
 	}
 

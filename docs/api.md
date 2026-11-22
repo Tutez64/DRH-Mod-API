@@ -246,7 +246,8 @@ A weapon, copied when read: it does not follow later changes.
 | Member | Type | Since | What |
 | --- | --- | --- | --- |
 | `slot` | `Int` | 1.0 | 0-based slot on the hero carrying it, -1 in storage. |
-| `id`, `name` | `UInt`, `String` | 1.0 | The game's item id, and its name as the inventory shows it, without its modifiers. |
+| `id`, `name` | `UInt`, `String` | 1.0 | The game's id of the weapon's kind, and its name as the inventory shows it, without its modifiers. |
+| `uid` | `UInt` | 1.6 | This weapon's own id in the account, unlike `id`, which every weapon of its kind shares, however alike two of them are. 0 for a weapon a hero carries in a dungeon, which the game only knows by its kind. |
 | `power`, `requiredLevel` | `UInt` | 1.0 |  |
 | `rarity`, `rarityColor`, `legendary` | `String`, `UInt`, `Bool` | 1.0 | The game's rarity constant (empty when unknown), the text color it uses for it, and whether it is legendary. |
 | `createIcon(size:Float)` | `Sprite` | 1.0 | The game's icon on its rarity background, centred in a `size` square; hovering it shows the game's tooltip. Empty before `ready`. |
