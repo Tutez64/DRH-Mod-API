@@ -21,7 +21,9 @@ class Monster {
 	public var healthBar(default, null):Bool;
 
 	/**
-	 * Its hit points, 0 once dead, and what they are when it is whole, with what its buffs add.
+	 * Its hit points, 0 once dead, and what they are when it is whole, with what its buffs add. In an
+	 * infinite dungeon, whose server makes monsters stronger than the game's data says, `maxHp` is the most
+	 * it has been seen with, which is its full health unless it was hurt before the mods saw it.
 	 * @since 1.5
 	 */
 	public var hp(default, null):UInt;

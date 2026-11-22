@@ -386,7 +386,7 @@ class Hub {
 		var facade = facade();
 		if (facade == null || foe.listener != null)
 			return;
-		foe.hp = foe.npc.hitPoints;
+		foe.setHp(foe.npc.hitPoints);
 		foe.listener = function(event:Dynamic) hpSet(foe, event.hp);
 		facade.eventManager.addEventListener(HP_UPDATE + Std.string(foe.id), foe.listener);
 	}
@@ -403,7 +403,7 @@ class Hub {
 	static function hpSet(foe:Foe, hp:UInt):Void {
 		if (hp == foe.hp)
 			return;
-		foe.hp = hp;
+		foe.setHp(hp);
 		if (heard(MONSTER_HURT))
 			emit(MONSTER_HURT, foe.last());
 	}

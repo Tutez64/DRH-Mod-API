@@ -21,6 +21,12 @@ class Foe {
 	/** Its hit points, kept from the game's event for them once the mods are told of it. */
 	var hp:UInt;
 
+	/**
+	 * The most hit points it has had. A monster comes whole, and an infinite dungeon's server raises them
+	 * past the game's own maximum, which knows nothing of it.
+	 */
+	var peakHp:UInt = 0;
+
 	/** Told to the mods as spawned. */
 	var told:Bool = false;
 
@@ -36,7 +42,13 @@ class Foe {
 		var gm = npc.gmNpc;
 		name = gm == null || gm.Name == null ? "" : gm.Name;
 		healthBar = gm != null && gm.HasHealthbar;
-		hp = npc.hitPoints;
+		setHp(npc.hitPoints);
+	}
+
+	function setHp(value:UInt):Void {
+		hp = value;
+		if (value > peakHp)
+			peakHp = value;
 	}
 
 	/** Whether it is a living enemy of the heroes, whose team is `heroes`. */
@@ -56,6 +68,7 @@ class Foe {
 	/** What a mod is handed, read now. */
 	function copy():Monster {
 		var position = npc.position;
-		return new Monster(id, name, position == null ? 0 : position.x, position == null ? 0 : position.y, healthBar, hp, Std.int(npc.maxHitPoints));
+		var maxHp:UInt = Std.int(npc.maxHitPoints);
+		return new Monster(id, name, position == null ? 0 : position.x, position == null ? 0 : position.y, healthBar, hp, maxHp > peakHp ? maxHp : peakHp);
 	}
 }

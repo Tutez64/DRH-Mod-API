@@ -153,7 +153,7 @@ A living enemy of the heroes, copied when read or when an event hands it. The ga
 | `name` | `String` | 1.1 | Its name in the game's data, such as `Golem Boss`. |
 | `x`, `y` | `Float` | 1.1 | World position, in the coordinates of [`Hero.x`](#hero) and [`Hero.y`](#hero). |
 | `healthBar` | `Bool` | 1.1 | Whether the game shows a health bar over it, as it does for the big ones: bosses, minibosses, and some others. |
-| `hp`, `maxHp` | `UInt` | 1.5 | Its hit points, 0 once dead, and what they are when it is whole, with what its buffs add. |
+| `hp`, `maxHp` | `UInt` | 1.5 | Its hit points, 0 once dead, and what they are when it is whole, with what its buffs add. In an infinite dungeon, whose server makes monsters stronger than the game's data says, `maxHp` is the most it has been seen with, which is its full health unless it was hurt before the mods saw it. |
 
 ### Hero
 
